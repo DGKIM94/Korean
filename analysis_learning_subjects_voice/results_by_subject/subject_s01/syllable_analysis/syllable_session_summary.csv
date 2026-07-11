@@ -1,0 +1,5 @@
+﻿subject,day,session_name,session_label,session_order,response_mode,n_trials,n_unique_syllables,mean_reps_per_syllable,accuracy,rt_mean_sec,rt_median_sec,rt_from_stimulus_mean_sec,rt_from_stimulus_median_sec,n_correct,n_errors
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,9,voice_stt_list,50,50,1.0,0.96,3.086314029998612,2.795746700023301,2.066630029998612,1.7908629999859258,48,2
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,10,voice_stt_list,33,33,1.0,0.7878787878787878,2.5887385878824825,2.404389299917966,1.455517963642164,1.321201800014451,26,7
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,9,voice_stt_list,50,50,1.0,0.94,2.6015117940027266,2.2144223500508815,1.5902056140042393,1.3332559999937192,47,3
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,9,voice_stt_list,50,50,1.0,0.98,2.2096688400162385,2.1557611498283222,1.1899848400162383,1.0920425499277189,49,1

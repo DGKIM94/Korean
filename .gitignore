@@ -1,0 +1,10 @@
+.venv/
+build/
+dist/
+__pycache__/
+*.pyc
+.install_complete
+logs/
+hangul_designer_results/
+hangul_tactile_setups/
+voice_profiles/

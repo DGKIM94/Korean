@@ -1,0 +1,755 @@
+﻿subject,day,session_name,session_label,trial_index_session,moving_accuracy,moving_rt
+s01,2026-05-28,all_consonants,S4 All consonants,1,1.0,1.0419776999624446
+s01,2026-05-28,all_consonants,S4 All consonants,2,1.0,1.286596899968572
+s01,2026-05-28,all_consonants,S4 All consonants,3,1.0,1.5993089666590095
+s01,2026-05-28,all_consonants,S4 All consonants,4,1.0,1.9208878499921411
+s01,2026-05-28,all_consonants,S4 All consonants,5,1.0,1.831619879999198
+s01,2026-05-28,all_consonants,S4 All consonants,6,1.0,1.7803530666666727
+s01,2026-05-28,all_consonants,S4 All consonants,7,1.0,1.7038971142943151
+s01,2026-05-28,all_consonants,S4 All consonants,8,1.0,1.62600381251832
+s01,2026-05-28,all_consonants,S4 All consonants,9,1.0,1.6087674222395032
+s01,2026-05-28,all_consonants,S4 All consonants,10,1.0,1.5655692200060003
+s01,2026-05-28,all_consonants,S4 All consonants,11,1.0,1.5553044600063004
+s01,2026-05-28,all_consonants,S4 All consonants,12,1.0,1.4992297600023448
+s01,2026-05-28,all_consonants,S4 All consonants,13,1.0,1.4185377599904314
+s01,2026-05-28,all_consonants,S4 All consonants,14,1.0,1.2989632599870675
+s01,2026-05-28,all_consonants,S4 All consonants,15,1.0,1.2823400699766352
+s01,2026-05-28,all_consonants,S4 All consonants,16,1.0,1.2863993399776519
+s01,2026-05-28,all_consonants,S4 All consonants,17,1.0,1.3524010999710299
+s01,2026-05-28,all_consonants,S4 All consonants,18,1.0,1.4130862499587238
+s01,2026-05-28,all_consonants,S4 All consonants,19,1.0,1.4080454199574888
+s01,2026-05-28,all_consonants,S4 All consonants,20,1.0,1.4291883199592121
+s01,2026-05-28,all_consonants,S4 All consonants,21,1.0,1.545483079960104
+s01,2026-05-28,all_consonants,S4 All consonants,22,1.0,1.570541599963326
+s01,2026-05-28,all_consonants,S4 All consonants,23,1.0,1.6578723599785008
+s01,2026-05-28,all_consonants,S4 All consonants,24,1.0,1.5825892299879343
+s01,2026-05-28,all_consonants,S4 All consonants,25,1.0,1.5520629800041206
+s01,2026-05-28,all_consonants,S4 All consonants,26,1.0,1.5312228200025857
+s01,2026-05-28,all_consonants,S4 All consonants,27,1.0,1.497334090003278
+s01,2026-05-28,all_consonants,S4 All consonants,28,1.0,1.4756745200022123
+s01,2026-05-28,all_consonants,S4 All consonants,29,1.0,1.4953814500011504
+s01,2026-05-28,all_consonants,S4 All consonants,30,1.0,1.4543950600083917
+s01,2026-05-28,all_consonants,S4 All consonants,31,1.0,1.3923788100131786
+s01,2026-05-28,all_consonants,S4 All consonants,32,1.0,1.398947980022058
+s01,2026-05-28,all_consonants,S4 All consonants,33,1.0,1.3000446600141005
+s01,2026-05-28,all_consonants,S4 All consonants,34,1.0,1.340346360008698
+s01,2026-05-28,all_consonants,S4 All consonants,35,1.0,1.345416279998608
+s01,2026-05-28,all_consonants,S4 All consonants,36,1.0,1.312872569996398
+s01,2026-05-28,all_consonants,S4 All consonants,37,1.0,1.2969689200050198
+s01,2026-05-28,all_consonants,S4 All consonants,38,1.0,1.22876561001176
+s01,2026-05-28,all_vowels,S8 All vowels,1,1.0,2.150130199966952
+s01,2026-05-28,all_vowels,S8 All vowels,2,1.0,2.0671260999515653
+s01,2026-05-28,all_vowels,S8 All vowels,3,1.0,1.8193253999731194
+s01,2026-05-28,all_vowels,S8 All vowels,4,1.0,1.6429841999779455
+s01,2026-05-28,all_vowels,S8 All vowels,5,1.0,1.9389011199818924
+s01,2026-05-28,all_vowels,S8 All vowels,6,1.0,1.95142376665414
+s01,2026-05-28,all_vowels,S8 All vowels,7,1.0,1.93449377142159
+s01,2026-05-28,all_vowels,S8 All vowels,8,1.0,1.8962207625008887
+s01,2026-05-28,all_vowels,S8 All vowels,9,1.0,1.9693451111023832
+s01,2026-05-28,all_vowels,S8 All vowels,10,1.0,1.9047571999952198
+s01,2026-05-28,all_vowels,S8 All vowels,11,1.0,1.8129763699951582
+s01,2026-05-28,all_vowels,S8 All vowels,12,1.0,1.8128634400083683
+s01,2026-05-28,all_vowels,S8 All vowels,13,1.0,1.9071976800099946
+s01,2026-05-28,all_vowels,S8 All vowels,14,1.0,1.9580944900168107
+s01,2026-05-28,all_vowels,S8 All vowels,15,1.0,1.8592420700122603
+s01,2026-05-28,all_vowels,S8 All vowels,16,1.0,1.871271750004962
+s01,2026-05-28,all_vowels,S8 All vowels,17,1.0,1.9013986199977808
+s01,2026-05-28,all_vowels,S8 All vowels,18,1.0,1.9159565099980682
+s01,2026-05-28,all_vowels,S8 All vowels,19,1.0,1.8259428700082936
+s01,2026-05-28,all_vowels,S8 All vowels,20,1.0,1.847062359994743
+s01,2026-05-28,all_vowels,S8 All vowels,21,1.0,1.9221519600017927
+s01,2026-05-28,all_vowels,S8 All vowels,22,1.0,1.9403113499982283
+s01,2026-05-28,all_vowels,S8 All vowels,23,1.0,1.905952319991775
+s01,2026-05-28,all_vowels,S8 All vowels,24,1.0,1.939211399992928
+s01,2026-05-28,all_vowels,S8 All vowels,25,1.0,1.8913668200024403
+s01,2026-05-28,all_vowels,S8 All vowels,26,1.0,1.8073220600024797
+s01,2026-05-28,all_vowels,S8 All vowels,27,1.0,1.7981960200006142
+s01,2026-05-28,all_vowels,S8 All vowels,28,1.0,1.7351436199853196
+s01,2026-05-28,all_vowels,S8 All vowels,29,1.0,1.7440340399742127
+s01,2026-05-28,all_vowels,S8 All vowels,30,1.0,1.734779399994295
+s01,2026-05-28,all_vowels,S8 All vowels,31,0.9,1.6480406899820081
+s01,2026-05-28,all_vowels,S8 All vowels,32,0.9,1.607005039975047
+s01,2026-05-28,all_vowels,S8 All vowels,33,0.9,1.5943605499807745
+s01,2026-05-28,all_vowels,S8 All vowels,34,0.9,1.7430536299711092
+s01,2026-05-28,all_vowels,S8 All vowels,35,0.9,1.8356955299736
+s01,2026-05-28,all_vowels,S8 All vowels,36,0.9,1.8450281099765562
+s01,2026-05-28,all_vowels,S8 All vowels,37,0.9,1.7743961899890563
+s01,2026-05-28,all_vowels,S8 All vowels,38,0.9,1.8119058300042525
+s01,2026-05-28,all_vowels,S8 All vowels,39,0.9,1.8487229300197214
+s01,2026-05-28,all_vowels,S8 All vowels,40,0.9,1.8673357300111093
+s01,2026-05-28,all_vowels,S8 All vowels,41,1.0,1.909158680017572
+s01,2026-05-28,all_vowels,S8 All vowels,42,1.0,1.8796380300307647
+s01,2026-05-28,all_vowels,S8 All vowels,43,1.0,1.832627170032356
+s01,2026-05-28,all_vowels,S8 All vowels,44,1.0,1.601523950032424
+s01,2026-05-28,all_vowels,S8 All vowels,45,1.0,1.4949690900277346
+s01,2026-05-28,all_vowels,S8 All vowels,46,1.0,1.4814223300316371
+s01,2026-05-28,all_vowels,S8 All vowels,47,1.0,1.5380064300261438
+s01,2026-05-28,all_vowels,S8 All vowels,48,1.0,1.570093870011624
+s01,2026-05-28,all_vowels,S8 All vowels,49,1.0,1.5221810600021854
+s01,2026-05-28,all_vowels,S8 All vowels,50,1.0,1.5339958900003694
+s01,2026-05-28,all_vowels,S8 All vowels,51,1.0,1.6428714799927548
+s01,2026-05-28,all_vowels,S8 All vowels,52,1.0,1.6266081299749202
+s01,2026-05-28,all_vowels,S8 All vowels,53,1.0,1.6803777499706485
+s01,2026-05-28,all_vowels,S8 All vowels,54,1.0,1.8560517399688252
+s01,2026-05-28,all_vowels,S8 All vowels,55,1.0,1.8694841599673964
+s01,2026-05-28,all_vowels,S8 All vowels,56,1.0,1.8694834399735556
+s01,2026-05-28,all_vowels,S8 All vowels,57,1.0,1.8768412199686282
+s01,2026-05-28,all_vowels,S8 All vowels,58,1.0,1.8799454299733043
+s01,2026-05-28,all_vowels,S8 All vowels,59,1.0,1.91742000997765
+s01,2026-05-28,all_vowels,S8 All vowels,60,1.0,1.9170985999749974
+s01,2026-05-28,all_vowels,S8 All vowels,61,1.0,1.7858980799792334
+s01,2026-05-28,all_vowels,S8 All vowels,62,1.0,1.8433477799873799
+s01,2026-05-28,all_vowels,S8 All vowels,63,1.0,1.7790632499963976
+s01,2026-05-28,all_vowels,S8 All vowels,64,1.0,1.6386840399936773
+s01,2026-05-28,all_vowels,S8 All vowels,65,1.0,1.6336786799947731
+s01,2026-05-28,all_vowels,S8 All vowels,66,1.0,1.6355107299867087
+s01,2026-05-28,all_vowels,S8 All vowels,67,1.0,1.5491936299949887
+s01,2026-05-28,all_vowels,S8 All vowels,68,1.0,1.5188483899924905
+s01,2026-05-28,all_vowels,S8 All vowels,69,1.0,1.475396059988998
+s01,2026-05-28,basic_consonants,S1 Basic consonants,1,1.0,1.3837559999665243
+s01,2026-05-28,basic_consonants,S1 Basic consonants,2,1.0,1.0684476000024006
+s01,2026-05-28,basic_consonants,S1 Basic consonants,3,1.0,0.9535454666862885
+s01,2026-05-28,basic_consonants,S1 Basic consonants,4,1.0,0.918716400017729
+s01,2026-05-28,basic_consonants,S1 Basic consonants,5,1.0,0.9472722399979829
+s01,2026-05-28,basic_consonants,S1 Basic consonants,6,1.0,0.9098779500151674
+s01,2026-05-28,basic_consonants,S1 Basic consonants,7,1.0,0.8962854000107784
+s01,2026-05-28,basic_consonants,S1 Basic consonants,8,1.0,0.8895609250030247
+s01,2026-05-28,basic_consonants,S1 Basic consonants,9,1.0,0.8731145333343496
+s01,2026-05-28,basic_consonants,S1 Basic consonants,10,1.0,0.8672170800040476
+s01,2026-05-28,basic_consonants,S1 Basic consonants,11,1.0,0.801244510000106
+s01,2026-05-28,basic_consonants,S1 Basic consonants,12,1.0,0.8163207900011912
+s01,2026-05-28,basic_consonants,S1 Basic consonants,13,1.0,0.8823260899982415
+s01,2026-05-28,basic_consonants,S1 Basic consonants,14,1.0,0.888313139998354
+s01,2026-05-28,basic_vowels,S5 Basic vowels,1,1.0,1.7601483000908047
+s01,2026-05-28,basic_vowels,S5 Basic vowels,2,1.0,1.5843847000505775
+s01,2026-05-28,basic_vowels,S5 Basic vowels,3,1.0,1.4378528667148203
+s01,2026-05-28,basic_vowels,S5 Basic vowels,4,1.0,1.350276550045237
+s01,2026-05-28,basic_vowels,S5 Basic vowels,5,1.0,1.3268609400372953
+s01,2026-05-28,basic_vowels,S5 Basic vowels,6,1.0,1.2762071167041238
+s01,2026-05-28,basic_vowels,S5 Basic vowels,7,1.0,1.2280429428875712
+s01,2026-05-28,basic_vowels,S5 Basic vowels,8,1.0,1.2116122000297764
+s01,2026-05-28,basic_vowels,S5 Basic vowels,9,1.0,1.1805760222487152
+s01,2026-05-28,basic_vowels,S5 Basic vowels,10,1.0,1.1618643800262363
+s01,2026-05-28,basic_vowels,S5 Basic vowels,11,1.0,1.0812909000203945
+s01,2026-05-28,basic_vowels,S5 Basic vowels,12,1.0,1.0592957700253465
+s01,2026-05-28,complex_vowels,S7 Complex vowels,1,1.0,3.40169790002983
+s01,2026-05-28,complex_vowels,S7 Complex vowels,2,1.0,4.1065009500598535
+s01,2026-05-28,complex_vowels,S7 Complex vowels,3,1.0,4.423587400039348
+s01,2026-05-28,complex_vowels,S7 Complex vowels,4,1.0,3.9253645750286523
+s01,2026-05-28,complex_vowels,S7 Complex vowels,5,1.0,3.6656488400418312
+s01,2026-05-28,complex_vowels,S7 Complex vowels,6,1.0,3.6814447166980244
+s01,2026-05-28,complex_vowels,S7 Complex vowels,7,1.0,3.468961957176881
+s01,2026-05-28,complex_vowels,S7 Complex vowels,8,1.0,3.3287391875201138
+s01,2026-05-28,complex_vowels,S7 Complex vowels,9,1.0,3.181521166685141
+s01,2026-05-28,complex_vowels,S7 Complex vowels,10,1.0,3.233616090018768
+s01,2026-05-28,complex_vowels,S7 Complex vowels,11,1.0,3.1879883500165307
+s01,2026-05-28,complex_vowels,S7 Complex vowels,12,1.0,2.921677780000027
+s01,2026-05-28,complex_vowels,S7 Complex vowels,13,1.0,2.645244400005322
+s01,2026-05-28,complex_vowels,S7 Complex vowels,14,1.0,2.604176500008907
+s01,2026-05-28,complex_vowels,S7 Complex vowels,15,1.0,2.716762929991819
+s01,2026-05-28,complex_vowels,S7 Complex vowels,16,1.0,2.5118762099999
+s01,2026-05-28,double_consonants,S3 Double consonants,1,1.0,1.7130038000177592
+s01,2026-05-28,double_consonants,S3 Double consonants,2,1.0,1.4281480500358157
+s01,2026-05-28,double_consonants,S3 Double consonants,3,1.0,1.6033403667000432
+s01,2026-05-28,double_consonants,S3 Double consonants,4,1.0,1.4208551750343759
+s01,2026-05-28,double_consonants,S3 Double consonants,5,1.0,1.5874930000398308
+s01,2026-05-28,double_consonants,S3 Double consonants,6,1.0,1.4988946333760396
+s01,2026-05-28,double_consonants,S3 Double consonants,7,1.0,1.4057429143161113
+s01,2026-05-28,double_consonants,S3 Double consonants,8,1.0,1.4105143375345506
+s01,2026-05-28,double_consonants,S3 Double consonants,9,1.0,1.3576279666869797
+s01,2026-05-28,double_consonants,S3 Double consonants,10,1.0,1.3571907100151293
+s01,2026-05-28,double_vowels,S6 Double vowels,1,1.0,1.6404276000102982
+s01,2026-05-28,double_vowels,S6 Double vowels,2,1.0,1.497671149962116
+s01,2026-05-28,double_vowels,S6 Double vowels,3,1.0,1.3798076333090041
+s01,2026-05-28,double_vowels,S6 Double vowels,4,1.0,1.3880940999661107
+s01,2026-05-28,double_vowels,S6 Double vowels,5,1.0,1.5084920399589463
+s01,2026-05-28,double_vowels,S6 Double vowels,6,1.0,1.491632566632082
+s01,2026-05-28,double_vowels,S6 Double vowels,7,1.0,1.4603413713962905
+s01,2026-05-28,double_vowels,S6 Double vowels,8,1.0,1.44510007496865
+s01,2026-05-28,double_vowels,S6 Double vowels,9,1.0,1.4321533555242543
+s01,2026-05-28,double_vowels,S6 Double vowels,10,1.0,1.4390913099632598
+s01,2026-05-28,long_consonants,S2 Long consonants,1,1.0,2.1026975999120623
+s01,2026-05-28,long_consonants,S2 Long consonants,2,1.0,1.847529599966947
+s01,2026-05-28,long_consonants,S2 Long consonants,3,1.0,1.7224568999760475
+s01,2026-05-28,long_consonants,S2 Long consonants,4,1.0,1.6299697749782354
+s01,2026-05-28,long_consonants,S2 Long consonants,5,1.0,1.6289711199933663
+s01,2026-05-28,long_consonants,S2 Long consonants,6,1.0,1.693286483331273
+s01,2026-05-28,long_consonants,S2 Long consonants,7,1.0,1.7734322000095355
+s01,2026-05-28,long_consonants,S2 Long consonants,8,1.0,1.7209263125114376
+s01,2026-05-28,long_consonants,S2 Long consonants,9,1.0,1.687019500014786
+s01,2026-05-28,long_consonants,S2 Long consonants,10,1.0,1.6356779200141318
+s01,2026-05-28,long_consonants,S2 Long consonants,11,1.0,1.6716839200118556
+s01,2026-05-28,long_consonants,S2 Long consonants,12,1.0,1.6329132900107652
+s01,2026-05-28,long_consonants,S2 Long consonants,13,1.0,1.5850576600059867
+s01,2026-05-28,long_consonants,S2 Long consonants,14,1.0,1.5642571100150235
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,1,1.0,4.036764199961908
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,2,1.0,3.4763910999754444
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,3,1.0,3.8354360999849937
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,4,1.0,3.484907749982085
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,5,1.0,3.395019599981606
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,6,1.0,3.4649112666375004
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,7,1.0,3.3399099714089453
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,8,1.0,3.2382886374834925
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,9,1.0,3.0840843666551843
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,10,1.0,3.227023909986019
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,11,1.0,3.0731349299894646
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,12,1.0,3.103161599999294
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,13,1.0,2.974712610000279
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,14,1.0,3.1582526099984536
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,15,1.0,3.3890205200063064
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,16,1.0,3.250458850013092
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,17,1.0,3.222076800011564
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,18,1.0,3.6848638500086963
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,19,1.0,3.7057223599986173
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,20,1.0,3.534230610006489
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,21,1.0,3.5840630399994553
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,22,1.0,3.424269659991842
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,23,1.0,3.342833769985009
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,24,1.0,3.2531206799903885
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,25,1.0,2.9591523899813184
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,26,1.0,3.058796139981132
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,27,1.0,3.0197238499764354
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,28,0.9,2.567018119979184
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,29,0.9,2.50195800998481
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,30,0.9,2.44212231998099
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,31,0.9,2.3457029799930753
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,32,0.9,2.3669271599850616
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,33,0.9,2.315954599995166
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,34,0.9,2.395591349992901
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,35,0.9,2.4653771299985237
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,36,0.9,2.4381898700026796
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,37,0.8,2.7399862000136634
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,38,0.9,3.0316789800068364
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,39,0.9,3.2291660500108263
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,40,0.9,3.208865200006403
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,41,0.9,3.301362019998487
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,42,0.9,3.344646400003694
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,43,0.9,3.714624220004771
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,44,0.9,3.5371157800080253
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,45,0.9,3.4617850300041026
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,46,0.9,3.4620492000016383
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,47,1.0,3.143416209996212
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,48,1.0,2.7970001200097614
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,49,1.0,2.737962740007788
+s01,2026-05-28,syllable_top50,S9 Syllable Top 50,50,1.0,3.019328110013157
+s01,2026-06-02,all_consonants,S4 All consonants,1,1.0,1.1164718000218272
+s01,2026-06-02,all_consonants,S4 All consonants,2,1.0,1.298830599989742
+s01,2026-06-02,all_consonants,S4 All consonants,3,0.6666666666666666,1.4894049666666735
+s01,2026-06-02,all_consonants,S4 All consonants,4,0.75,1.553065849991981
+s01,2026-06-02,all_consonants,S4 All consonants,5,0.8,1.4360975799616427
+s01,2026-06-02,all_consonants,S4 All consonants,6,0.8333333333333334,1.4305548999691382
+s01,2026-06-02,all_consonants,S4 All consonants,7,0.8571428571428571,1.3980807713898165
+s01,2026-06-02,all_consonants,S4 All consonants,8,0.875,1.3401519249891862
+s01,2026-06-02,all_consonants,S4 All consonants,9,0.8888888888888888,1.3050509999868356
+s01,2026-06-02,all_consonants,S4 All consonants,10,0.9,1.2749111799756065
+s01,2026-06-02,all_consonants,S4 All consonants,11,0.9,1.3650246799690648
+s01,2026-06-02,all_consonants,S4 All consonants,12,0.9,1.288350459979847
+s01,2026-06-02,all_consonants,S4 All consonants,13,1.0,1.1865641799755395
+s01,2026-06-02,all_consonants,S4 All consonants,14,1.0,1.117916729976423
+s01,2026-06-02,all_consonants,S4 All consonants,15,1.0,1.1157002199906856
+s01,2026-06-02,all_consonants,S4 All consonants,16,0.9,1.0677568699931725
+s01,2026-06-02,all_consonants,S4 All consonants,17,0.9,1.0859171099960805
+s01,2026-06-02,all_consonants,S4 All consonants,18,0.9,1.0983093499671668
+s01,2026-06-02,all_consonants,S4 All consonants,19,0.9,1.1778034499613568
+s01,2026-06-02,all_consonants,S4 All consonants,20,0.9,1.191923079988919
+s01,2026-06-02,all_consonants,S4 All consonants,21,0.9,1.1015215199906379
+s01,2026-06-02,all_consonants,S4 All consonants,22,0.9,1.2382686799857765
+s01,2026-06-02,all_consonants,S4 All consonants,23,0.9,1.2734196299919858
+s01,2026-06-02,all_consonants,S4 All consonants,24,0.9,1.267216769978404
+s01,2026-06-02,all_consonants,S4 All consonants,25,0.9,1.3140807899879292
+s01,2026-06-02,all_consonants,S4 All consonants,26,1.0,1.4470484999939799
+s01,2026-06-02,all_consonants,S4 All consonants,27,1.0,1.4228917799890042
+s01,2026-06-02,all_consonants,S4 All consonants,28,1.0,1.422435829997994
+s01,2026-06-02,all_consonants,S4 All consonants,29,1.0,1.343748679989949
+s01,2026-06-02,all_consonants,S4 All consonants,30,1.0,1.3107546899700537
+s01,2026-06-02,all_consonants,S4 All consonants,31,1.0,1.307980449986644
+s01,2026-06-02,all_consonants,S4 All consonants,32,1.0,1.193528869980946
+s01,2026-06-02,all_consonants,S4 All consonants,33,1.0,1.172472669975832
+s01,2026-06-02,all_consonants,S4 All consonants,34,1.0,1.175531329982914
+s01,2026-06-02,all_consonants,S4 All consonants,35,1.0,1.2115904599893839
+s01,2026-06-02,all_consonants,S4 All consonants,36,1.0,1.151981469988823
+s01,2026-06-02,all_consonants,S4 All consonants,37,1.0,1.168897459981963
+s01,2026-06-02,all_consonants,S4 All consonants,38,1.0,1.1756685299798846
+s01,2026-06-02,all_consonants,S4 All consonants,39,1.0,1.21001241998747
+s01,2026-06-02,all_consonants,S4 All consonants,40,1.0,1.2281934699974955
+s01,2026-06-02,all_consonants,S4 All consonants,41,1.0,1.2100011099828407
+s01,2026-06-02,all_consonants,S4 All consonants,42,1.0,1.2697480299975723
+s01,2026-06-02,all_consonants,S4 All consonants,43,1.0,1.269758819998242
+s01,2026-06-02,all_consonants,S4 All consonants,44,1.0,1.290467209997587
+s01,2026-06-02,all_consonants,S4 All consonants,45,1.0,1.2183553699869663
+s01,2026-06-02,all_consonants,S4 All consonants,46,1.0,1.239061339967884
+s01,2026-06-02,all_consonants,S4 All consonants,47,1.0,1.196069649979472
+s01,2026-06-02,all_consonants,S4 All consonants,48,1.0,1.229323249962181
+s01,2026-06-02,all_consonants,S4 All consonants,49,1.0,1.2244698399910703
+s01,2026-06-02,all_consonants,S4 All consonants,50,1.0,1.2183842199854553
+s01,2026-06-02,all_consonants,S4 All consonants,51,1.0,1.347806609980762
+s01,2026-06-02,all_consonants,S4 All consonants,52,1.0,1.2967303099576384
+s01,2026-06-02,all_consonants,S4 All consonants,53,1.0,1.4377380199497565
+s01,2026-06-02,all_consonants,S4 All consonants,54,1.0,1.4539587899576873
+s01,2026-06-02,all_vowels,S8 All vowels,1,1.0,1.6539111000020057
+s01,2026-06-02,all_vowels,S8 All vowels,2,1.0,1.5941968499682844
+s01,2026-06-02,all_vowels,S8 All vowels,3,1.0,1.6640924332508196
+s01,2026-06-02,all_vowels,S8 All vowels,4,1.0,1.6316635249531828
+s01,2026-06-02,all_vowels,S8 All vowels,5,0.8,1.630041359970346
+s01,2026-06-02,all_vowels,S8 All vowels,6,0.8333333333333334,1.663958066647562
+s01,2026-06-02,all_vowels,S8 All vowels,7,0.8571428571428571,1.5982615428178437
+s01,2026-06-02,all_vowels,S8 All vowels,8,0.875,1.6013790874858387
+s01,2026-06-02,all_vowels,S8 All vowels,9,0.8888888888888888,1.6206971666672163
+s01,2026-06-02,all_vowels,S8 All vowels,10,0.9,1.6269313599914312
+s01,2026-06-02,all_vowels,S8 All vowels,11,0.9,1.6631015499820934
+s01,2026-06-02,all_vowels,S8 All vowels,12,0.9,1.6960740600014106
+s01,2026-06-02,all_vowels,S8 All vowels,13,0.9,1.6390489000361412
+s01,2026-06-02,all_vowels,S8 All vowels,14,0.9,1.6360267100390047
+s01,2026-06-02,all_vowels,S8 All vowels,15,1.0,1.663042760035023
+s01,2026-06-02,all_vowels,S8 All vowels,16,1.0,1.6360242900205777
+s01,2026-06-02,all_vowels,S8 All vowels,17,1.0,1.6340781500330195
+s01,2026-06-02,all_vowels,S8 All vowels,18,1.0,1.5921923400135711
+s01,2026-06-02,all_vowels,S8 All vowels,19,1.0,1.5636674500070513
+s01,2026-06-02,all_vowels,S8 All vowels,20,1.0,1.599748850008473
+s01,2026-06-02,all_vowels,S8 All vowels,21,1.0,1.5099953700089828
+s01,2026-06-02,all_vowels,S8 All vowels,22,1.0,1.423025539983064
+s01,2026-06-02,all_vowels,S8 All vowels,23,1.0,1.3811882399488242
+s01,2026-06-02,all_vowels,S8 All vowels,24,1.0,1.3242199199507014
+s01,2026-06-02,all_vowels,S8 All vowels,25,1.0,1.3115062699420377
+s01,2026-06-02,all_vowels,S8 All vowels,26,1.0,1.300967409950681
+s01,2026-06-02,all_vowels,S8 All vowels,27,1.0,1.3453410799615084
+s01,2026-06-02,all_vowels,S8 All vowels,28,1.0,1.3453416699543594
+s01,2026-06-02,all_vowels,S8 All vowels,29,1.0,1.350124209956266
+s01,2026-06-02,all_vowels,S8 All vowels,30,0.9,1.248878589970991
+s01,2026-06-02,all_vowels,S8 All vowels,31,0.9,1.2665941399754956
+s01,2026-06-02,all_vowels,S8 All vowels,32,0.9,1.2725979199865833
+s01,2026-06-02,all_vowels,S8 All vowels,33,0.9,1.2882560100173577
+s01,2026-06-02,all_vowels,S8 All vowels,34,0.9,1.3722845500102268
+s01,2026-06-02,all_vowels,S8 All vowels,35,0.9,1.3699473100015893
+s01,2026-06-02,all_vowels,S8 All vowels,36,0.9,1.4714369900058955
+s01,2026-06-02,all_vowels,S8 All vowels,37,0.9,1.5009367499966175
+s01,2026-06-02,all_vowels,S8 All vowels,38,0.9,1.5288465899880976
+s01,2026-06-02,all_vowels,S8 All vowels,39,0.9,1.4870910299709066
+s01,2026-06-02,all_vowels,S8 All vowels,40,1.0,1.507556189969182
+s01,2026-06-02,all_vowels,S8 All vowels,41,1.0,1.5374819899676369
+s01,2026-06-02,all_vowels,S8 All vowels,42,1.0,1.5768722499720753
+s01,2026-06-02,all_vowels,S8 All vowels,43,1.0,1.6511819799663499
+s01,2026-06-02,all_vowels,S8 All vowels,44,1.0,1.6839682299643755
+s01,2026-06-02,all_vowels,S8 All vowels,45,1.0,1.6274515299824999
+s01,2026-06-02,all_vowels,S8 All vowels,46,1.0,1.5010742499725895
+s01,2026-06-02,all_vowels,S8 All vowels,47,1.0,1.499057069979608
+s01,2026-06-02,all_vowels,S8 All vowels,48,1.0,1.558311320003122
+s01,2026-06-02,all_vowels,S8 All vowels,49,0.9,1.5586650500074029
+s01,2026-06-02,all_vowels,S8 All vowels,50,0.9,1.5888037599856033
+s01,2026-06-02,all_vowels,S8 All vowels,51,0.9,1.5348447599913926
+s01,2026-06-02,all_vowels,S8 All vowels,52,0.9,1.48581868999172
+s01,2026-06-02,all_vowels,S8 All vowels,53,0.9,1.4827412599697711
+s01,2026-06-02,all_vowels,S8 All vowels,54,0.9,1.4208610499743373
+s01,2026-06-02,all_vowels,S8 All vowels,55,0.9,1.4262762299738825
+s01,2026-06-02,all_vowels,S8 All vowels,56,0.9,1.4149145799688996
+s01,2026-06-02,all_vowels,S8 All vowels,57,0.9,1.366062289965339
+s01,2026-06-02,all_vowels,S8 All vowels,58,0.9,1.3215649799676612
+s01,2026-06-02,all_vowels,S8 All vowels,59,1.0,1.3086066899821163
+s01,2026-06-02,all_vowels,S8 All vowels,60,1.0,1.3182468399871141
+s01,2026-06-02,all_vowels,S8 All vowels,61,1.0,1.305978349992074
+s01,2026-06-02,all_vowels,S8 All vowels,62,1.0,1.3608523999806494
+s01,2026-06-02,all_vowels,S8 All vowels,63,1.0,1.3379925200017169
+s01,2026-06-02,all_vowels,S8 All vowels,64,1.0,1.3161780700087546
+s01,2026-06-02,all_vowels,S8 All vowels,65,1.0,1.3583342500030995
+s01,2026-06-02,all_vowels,S8 All vowels,66,1.0,1.4711802700301633
+s01,2026-06-02,all_vowels,S8 All vowels,67,1.0,1.439304990042001
+s01,2026-06-02,all_vowels,S8 All vowels,68,1.0,1.4205962800420822
+s01,2026-06-02,all_vowels,S8 All vowels,69,1.0,1.4870739900507033
+s01,2026-06-02,all_vowels,S8 All vowels,70,1.0,1.5073349200654775
+s01,2026-06-02,all_vowels,S8 All vowels,71,1.0,1.5717386800562962
+s01,2026-06-02,all_vowels,S8 All vowels,72,1.0,1.572028070059605
+s01,2026-06-02,all_vowels,S8 All vowels,73,0.9,1.5768382400507108
+s01,2026-06-02,all_vowels,S8 All vowels,74,0.9,1.5838927800301463
+s01,2026-06-02,all_vowels,S8 All vowels,75,0.9,1.5353788800304755
+s01,2026-06-02,all_vowels,S8 All vowels,76,0.9,1.4486048800172284
+s01,2026-06-02,basic_consonants,S1 Basic consonants,1,1.0,1.2401197000872344
+s01,2026-06-02,basic_consonants,S1 Basic consonants,2,1.0,0.9527236999711022
+s01,2026-06-02,basic_consonants,S1 Basic consonants,3,1.0,0.8475576333391169
+s01,2026-06-02,basic_consonants,S1 Basic consonants,4,1.0,0.9842142999987118
+s01,2026-06-02,basic_consonants,S1 Basic consonants,5,1.0,0.9988891200162471
+s01,2026-06-02,basic_consonants,S1 Basic consonants,6,1.0,1.21169860001343
+s01,2026-06-02,basic_consonants,S1 Basic consonants,7,1.0,1.164053885731846
+s01,2026-06-02,basic_consonants,S1 Basic consonants,8,1.0,1.131660050014034
+s01,2026-06-02,basic_consonants,S1 Basic consonants,9,1.0,1.0922071778008506
+s01,2026-06-02,basic_consonants,S1 Basic consonants,10,1.0,1.0405508100055159
+s01,2026-06-02,basic_consonants,S1 Basic consonants,11,1.0,1.0100898900069297
+s01,2026-06-02,basic_consonants,S1 Basic consonants,12,0.9,1.1209231300279499
+s01,2026-06-02,basic_consonants,S1 Basic consonants,13,0.9,1.1387664000270887
+s01,2026-06-02,basic_consonants,S1 Basic consonants,14,0.9,1.086684300028719
+s01,2026-06-02,basic_consonants,S1 Basic consonants,15,0.9,1.0503502800362186
+s01,2026-06-02,basic_consonants,S1 Basic consonants,16,0.9,0.9290944200241938
+s01,2026-06-02,basic_consonants,S1 Basic consonants,17,0.9,0.9257348300190642
+s01,2026-06-02,basic_consonants,S1 Basic consonants,18,0.9,0.970663550007157
+s01,2026-06-02,basic_consonants,S1 Basic consonants,19,0.9,0.9654729799833148
+s01,2026-06-02,basic_consonants,S1 Basic consonants,20,0.9,1.0764025299809874
+s01,2026-06-02,basic_consonants,S1 Basic consonants,21,0.9,1.049437839980237
+s01,2026-06-02,basic_consonants,S1 Basic consonants,22,1.0,0.9655366399558261
+s01,2026-06-02,basic_consonants,S1 Basic consonants,23,1.0,0.9774402799550443
+s01,2026-06-02,basic_consonants,S1 Basic consonants,24,1.0,0.992539249965921
+s01,2026-06-02,basic_consonants,S1 Basic consonants,25,1.0,1.0469436899526046
+s01,2026-06-02,basic_consonants,S1 Basic consonants,26,1.0,1.0647495299577714
+s01,2026-06-02,basic_vowels,S5 Basic vowels,1,1.0,0.9192278000991791
+s01,2026-06-02,basic_vowels,S5 Basic vowels,2,1.0,0.881558750057593
+s01,2026-06-02,basic_vowels,S5 Basic vowels,3,1.0,0.9290581666864455
+s01,2026-06-02,basic_vowels,S5 Basic vowels,4,1.0,1.06535587500548
+s01,2026-06-02,basic_vowels,S5 Basic vowels,5,1.0,1.0769189800135792
+s01,2026-06-02,basic_vowels,S5 Basic vowels,6,1.0,1.0524646000315745
+s01,2026-06-02,basic_vowels,S5 Basic vowels,7,1.0,1.0302933000161179
+s01,2026-06-02,basic_vowels,S5 Basic vowels,8,1.0,1.0265826625109185
+s01,2026-06-02,basic_vowels,S5 Basic vowels,9,1.0,1.026445644441992
+s01,2026-06-02,basic_vowels,S5 Basic vowels,10,1.0,1.3068966999882832
+s01,2026-06-02,basic_vowels,S5 Basic vowels,11,1.0,1.3148466499755158
+s01,2026-06-02,basic_vowels,S5 Basic vowels,12,1.0,1.3328998199896887
+s01,2026-06-02,complex_vowels,S7 Complex vowels,1,1.0,2.374157699989155
+s01,2026-06-02,complex_vowels,S7 Complex vowels,2,1.0,2.359021099982783
+s01,2026-06-02,complex_vowels,S7 Complex vowels,3,1.0,2.123154366699358
+s01,2026-06-02,complex_vowels,S7 Complex vowels,4,1.0,2.068030875059776
+s01,2026-06-02,complex_vowels,S7 Complex vowels,5,1.0,2.0679026600439103
+s01,2026-06-02,complex_vowels,S7 Complex vowels,6,1.0,2.1082110333954915
+s01,2026-06-02,complex_vowels,S7 Complex vowels,7,1.0,2.0949288572051694
+s01,2026-06-02,complex_vowels,S7 Complex vowels,8,1.0,2.111042462551268
+s01,2026-06-02,complex_vowels,S7 Complex vowels,9,1.0,2.1117850778003535
+s01,2026-06-02,complex_vowels,S7 Complex vowels,10,1.0,2.131896010017954
+s01,2026-06-02,complex_vowels,S7 Complex vowels,11,1.0,2.1319133900338785
+s01,2026-06-02,complex_vowels,S7 Complex vowels,12,1.0,2.0418216900201513
+s01,2026-06-02,complex_vowels,S7 Complex vowels,13,1.0,2.039021659991704
+s01,2026-06-02,complex_vowels,S7 Complex vowels,14,1.0,2.0022291299887
+s01,2026-06-02,complex_vowels,S7 Complex vowels,15,1.0,1.9796690100105478
+s01,2026-06-02,complex_vowels,S7 Complex vowels,16,1.0,1.8930854099802672
+s01,2026-06-02,double_consonants,S3 Double consonants,1,1.0,0.7729362000245601
+s01,2026-06-02,double_consonants,S3 Double consonants,2,1.0,0.838990050018765
+s01,2026-06-02,double_consonants,S3 Double consonants,3,1.0,1.0338246333412826
+s01,2026-06-02,double_consonants,S3 Double consonants,4,1.0,1.0769974499708042
+s01,2026-06-02,double_consonants,S3 Double consonants,5,1.0,1.055240960000083
+s01,2026-06-02,double_consonants,S3 Double consonants,6,1.0,1.1012379833264276
+s01,2026-06-02,double_consonants,S3 Double consonants,7,1.0,1.0724155714269727
+s01,2026-06-02,double_consonants,S3 Double consonants,8,1.0,1.0401311874738894
+s01,2026-06-02,double_consonants,S3 Double consonants,9,1.0,1.0280295110876776
+s01,2026-06-02,double_consonants,S3 Double consonants,10,1.0,1.0011706999735908
+s01,2026-06-02,double_vowels,S6 Double vowels,1,1.0,1.8758323001675308
+s01,2026-06-02,double_vowels,S6 Double vowels,2,1.0,1.7229453000472859
+s01,2026-06-02,double_vowels,S6 Double vowels,3,1.0,1.6079438000451773
+s01,2026-06-02,double_vowels,S6 Double vowels,4,1.0,1.5445786750060506
+s01,2026-06-02,double_vowels,S6 Double vowels,5,1.0,1.4984417600091546
+s01,2026-06-02,double_vowels,S6 Double vowels,6,1.0,1.4493630499734234
+s01,2026-06-02,double_vowels,S6 Double vowels,7,1.0,1.4184652142492788
+s01,2026-06-02,double_vowels,S6 Double vowels,8,1.0,1.3992306999571156
+s01,2026-06-02,double_vowels,S6 Double vowels,9,1.0,1.3841160221749709
+s01,2026-06-02,double_vowels,S6 Double vowels,10,1.0,1.3810593899572268
+s01,2026-06-02,long_consonants,S2 Long consonants,1,1.0,1.2397819000761956
+s01,2026-06-02,long_consonants,S2 Long consonants,2,1.0,1.1917097000405192
+s01,2026-06-02,long_consonants,S2 Long consonants,3,1.0,1.1859811999990295
+s01,2026-06-02,long_consonants,S2 Long consonants,4,1.0,1.1380311499815434
+s01,2026-06-02,long_consonants,S2 Long consonants,5,1.0,1.103514859965071
+s01,2026-06-02,long_consonants,S2 Long consonants,6,0.8333333333333334,1.340280433301814
+s01,2026-06-02,long_consonants,S2 Long consonants,7,0.8571428571428571,1.404571728548035
+s01,2026-06-02,long_consonants,S2 Long consonants,8,0.875,1.346666537487181
+s01,2026-06-02,long_consonants,S2 Long consonants,9,0.8888888888888888,1.343157233308173
+s01,2026-06-02,long_consonants,S2 Long consonants,10,0.9,1.3289488099748268
+s01,2026-06-02,long_consonants,S2 Long consonants,11,0.9,1.2953858099645004
+s01,2026-06-02,long_consonants,S2 Long consonants,12,0.9,1.2804806499741972
+s01,2026-06-02,long_consonants,S2 Long consonants,13,0.9,1.2925330799771473
+s01,2026-06-02,long_consonants,S2 Long consonants,14,0.8,1.298932099970989
+s01,2026-06-02,long_consonants,S2 Long consonants,15,0.8,1.3522092399885879
+s01,2026-06-02,long_consonants,S2 Long consonants,16,0.9,1.2031854199944063
+s01,2026-06-02,long_consonants,S2 Long consonants,17,0.9,1.1205293599748984
+s01,2026-06-02,long_consonants,S2 Long consonants,18,0.9,1.191926939971745
+s01,2026-06-02,long_consonants,S2 Long consonants,19,0.9,1.143578249984421
+s01,2026-06-02,long_consonants,S2 Long consonants,20,0.9,1.0877427999861538
+s01,2026-06-02,long_consonants,S2 Long consonants,21,0.9,1.0597286299802362
+s01,2026-06-02,long_consonants,S2 Long consonants,22,0.9,1.231477059959434
+s01,2026-06-02,long_consonants,S2 Long consonants,23,0.9,1.2104500799672677
+s01,2026-06-02,long_consonants,S2 Long consonants,24,1.0,1.2349127299617977
+s01,2026-06-02,long_consonants,S2 Long consonants,25,1.0,1.1921530499355868
+s01,2026-06-02,long_consonants,S2 Long consonants,26,1.0,1.1866504799341784
+s01,2026-06-02,long_consonants,S2 Long consonants,27,1.0,1.177981639956124
+s01,2026-06-02,long_consonants,S2 Long consonants,28,1.0,1.0935429399600252
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,1,1.0,3.214246300049126
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,2,1.0,2.809317799983546
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,3,1.0,3.1541117667220533
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,4,1.0,2.9964092750451528
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,5,1.0,2.8538511800114064
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,6,1.0,2.7360050166413807
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,7,1.0,2.7144663714072004
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,8,0.875,2.874056587461382
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,9,0.8888888888888888,2.6923273555261806
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,10,0.9,2.623423939966597
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,11,0.9,2.4504393099574373
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,12,0.9,2.3483984399586917
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,13,0.9,2.0900596999563277
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,14,0.8,2.177162339957431
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,15,0.8,2.2629942599684
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,16,0.8,2.2474674299824984
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,17,0.8,2.14909382998012
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,18,0.9,1.9281486900057643
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,19,0.8,1.9990285200066864
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,20,0.7,2.00256662000902
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,21,0.7,2.1583094200119377
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,22,0.7,2.227028420032002
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,23,0.7,2.4795759400120003
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,24,0.7,2.53363189001102
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,25,0.7,2.4841428500134497
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,26,0.7,2.531123450025916
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,27,0.7,2.556547740031965
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,28,0.7,2.5919193800073117
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,29,0.8,2.760770729999058
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,30,0.9,2.910106260003522
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,31,0.8,3.005634670006111
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,32,0.7,2.9760670900112016
+s01,2026-06-02,syllable_top100,S10 Syllable Top 100,33,0.7,3.0269681700272484
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,1,0.0,1.805553400190547
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,2,0.5,2.014982500113547
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,3,0.6666666666666666,2.3244639333958426
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,4,0.75,2.1648152500856668
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,5,0.8,2.032572980085388
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,6,0.8333333333333334,2.264403433383753
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,7,0.8571428571428571,2.421636885763811
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,8,0.875,2.4193357250478584
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,9,0.7777777777777778,2.3489112111532853
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,10,0.8,2.3913484000368044
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,11,0.9,2.3443139600101857
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,12,0.9,2.266414829995483
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,13,0.9,2.5218036899808793
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,14,0.9,2.5937707799719645
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,15,0.9,2.6229268599534405
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,16,0.8,2.688719639950432
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,17,0.8,2.665596169955097
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,18,0.8,2.6244982099626215
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,19,0.9,2.8244028999470174
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,20,0.9,2.864512059953995
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,21,0.9,3.0585621499456463
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,22,0.9,3.073944849940017
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,23,0.9,2.851156509970315
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,24,0.9,2.7887363799614833
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,25,0.9,2.8292866699630395
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,26,1.0,2.729722339985892
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,27,1.0,3.0594468199647964
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,28,1.0,3.1246337799588217
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,29,1.0,3.006653199973516
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,30,1.0,2.909659039974213
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,31,1.0,2.798694349988364
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,32,1.0,3.018201840016991
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,33,1.0,2.925205900007859
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,34,1.0,2.947279220004566
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,35,1.0,3.139203139999881
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,36,1.0,3.027694549993612
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,37,1.0,2.5990410200087353
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,38,1.0,2.49406218000222
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,39,1.0,2.5056380700087173
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,40,1.0,2.504510260000825
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,41,1.0,2.4832154999952762
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,42,1.0,2.509213299979456
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,43,1.0,2.4735392399830745
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,44,1.0,2.4807219999842345
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,45,1.0,2.2431477200007066
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,46,1.0,2.2263998300069945
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,47,1.0,2.3213185500120743
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,48,1.0,2.3301943200174717
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,49,1.0,2.3434925300301983
+s01,2026-06-02,syllable_top50,S9 Syllable Top 50,50,1.0,2.3375292100477965
+s01,2026-06-04,all_consonants,S4 All consonants,1,1.0,0.9468247001059352
+s01,2026-06-04,all_consonants,S4 All consonants,2,1.0,1.075324850040488
+s01,2026-06-04,all_consonants,S4 All consonants,3,1.0,1.0643823666808505
+s01,2026-06-04,all_consonants,S4 All consonants,4,1.0,1.1887509250082076
+s01,2026-06-04,all_consonants,S4 All consonants,5,1.0,1.144188700011
+s01,2026-06-04,all_consonants,S4 All consonants,6,1.0,1.0851389166588585
+s01,2026-06-04,all_consonants,S4 All consonants,7,1.0,1.0638558571226895
+s01,2026-06-04,all_consonants,S4 All consonants,8,1.0,1.0787469999922905
+s01,2026-06-04,all_consonants,S4 All consonants,9,1.0,1.147175844422438
+s01,2026-06-04,all_consonants,S4 All consonants,10,1.0,1.1526266899891198
+s01,2026-06-04,all_consonants,S4 All consonants,11,1.0,1.1703978899866343
+s01,2026-06-04,all_consonants,S4 All consonants,12,1.0,1.1510357599938288
+s01,2026-06-04,all_consonants,S4 All consonants,13,1.0,1.1911247299984098
+s01,2026-06-04,all_consonants,S4 All consonants,14,1.0,1.1413875099970028
+s01,2026-06-04,all_consonants,S4 All consonants,15,1.0,1.2291509099770337
+s01,2026-06-04,all_consonants,S4 All consonants,16,1.0,1.322346659982577
+s01,2026-06-04,all_consonants,S4 All consonants,17,1.0,1.3219673099927605
+s01,2026-06-04,all_consonants,S4 All consonants,18,1.0,1.292278439970687
+s01,2026-06-04,all_consonants,S4 All consonants,19,1.0,1.1998040799750016
+s01,2026-06-04,all_consonants,S4 All consonants,20,1.0,1.2631526599638163
+s01,2026-06-04,all_consonants,S4 All consonants,21,1.0,1.223062519938685
+s01,2026-06-04,all_consonants,S4 All consonants,22,1.0,1.2566949899308384
+s01,2026-06-04,all_consonants,S4 All consonants,23,1.0,1.2136694399407133
+s01,2026-06-04,all_consonants,S4 All consonants,24,1.0,1.1857812299393118
+s01,2026-06-04,all_consonants,S4 All consonants,25,1.0,1.1947822499787435
+s01,2026-06-04,all_consonants,S4 All consonants,26,1.0,1.1241276799701154
+s01,2026-06-04,all_consonants,S4 All consonants,27,1.0,1.1333771799691021
+s01,2026-06-04,all_consonants,S4 All consonants,28,1.0,1.154557629977353
+s01,2026-06-04,all_consonants,S4 All consonants,29,1.0,1.1934557999949902
+s01,2026-06-04,all_consonants,S4 All consonants,30,1.0,1.085269089997746
+s01,2026-06-04,all_consonants,S4 All consonants,31,1.0,1.103477090015076
+s01,2026-06-04,all_consonants,S4 All consonants,32,1.0,1.0772138400236144
+s01,2026-06-04,all_consonants,S4 All consonants,33,1.0,1.069430460012518
+s01,2026-06-04,all_consonants,S4 All consonants,34,1.0,1.0783764800289646
+s01,2026-06-04,all_consonants,S4 All consonants,35,1.0,0.9725595599971711
+s01,2026-06-04,all_consonants,S4 All consonants,36,1.0,0.9603333099978044
+s01,2026-06-04,all_consonants,S4 All consonants,37,1.0,0.999229530012235
+s01,2026-06-04,all_consonants,S4 All consonants,38,1.0,0.9883405000204222
+s01,2026-06-04,all_vowels,S8 All vowels,1,1.0,1.4224884998984637
+s01,2026-06-04,all_vowels,S8 All vowels,2,1.0,1.448697549989447
+s01,2026-06-04,all_vowels,S8 All vowels,3,1.0,1.4570737332881738
+s01,2026-06-04,all_vowels,S8 All vowels,4,1.0,1.4836891999584623
+s01,2026-06-04,all_vowels,S8 All vowels,5,1.0,1.5836894799489527
+s01,2026-06-04,all_vowels,S8 All vowels,6,1.0,1.6203563332868118
+s01,2026-06-04,all_vowels,S8 All vowels,7,1.0,1.620766471406179
+s01,2026-06-04,all_vowels,S8 All vowels,8,1.0,1.6023893374658655
+s01,2026-06-04,all_vowels,S8 All vowels,9,1.0,1.5548852221885074
+s01,2026-06-04,all_vowels,S8 All vowels,10,1.0,1.550197619968094
+s01,2026-06-04,all_vowels,S8 All vowels,11,1.0,1.5378967199707403
+s01,2026-06-04,all_vowels,S8 All vowels,12,1.0,1.5528594799572601
+s01,2026-06-04,all_vowels,S8 All vowels,13,1.0,1.5169041099725291
+s01,2026-06-04,all_vowels,S8 All vowels,14,1.0,1.5078821299830452
+s01,2026-06-04,all_vowels,S8 All vowels,15,1.0,1.4839259600033983
+s01,2026-06-04,all_vowels,S8 All vowels,16,1.0,1.4539306900231168
+s01,2026-06-04,all_vowels,S8 All vowels,17,1.0,1.4032635899959132
+s01,2026-06-04,all_vowels,S8 All vowels,18,1.0,1.358309209998697
+s01,2026-06-04,all_vowels,S8 All vowels,19,1.0,1.3792269000085071
+s01,2026-06-04,all_vowels,S8 All vowels,20,1.0,1.3757371000014245
+s01,2026-06-04,all_vowels,S8 All vowels,21,1.0,1.4455424200044946
+s01,2026-06-04,all_vowels,S8 All vowels,22,1.0,1.4154926700051875
+s01,2026-06-04,all_vowels,S8 All vowels,23,1.0,1.4274663600139321
+s01,2026-06-04,all_vowels,S8 All vowels,24,1.0,1.4275645300047473
+s01,2026-06-04,all_vowels,S8 All vowels,25,1.0,1.4811734999995678
+s01,2026-06-04,all_vowels,S8 All vowels,26,1.0,1.449184009968303
+s01,2026-06-04,all_vowels,S8 All vowels,27,1.0,1.4371358199743554
+s01,2026-06-04,all_vowels,S8 All vowels,28,1.0,1.487770890002139
+s01,2026-06-04,all_vowels,S8 All vowels,29,1.0,1.4847258699825034
+s01,2026-06-04,all_vowels,S8 All vowels,30,1.0,1.5478161399718373
+s01,2026-06-04,all_vowels,S8 All vowels,31,1.0,1.496000689989887
+s01,2026-06-04,all_vowels,S8 All vowels,32,1.0,1.478072359994985
+s01,2026-06-04,all_vowels,S8 All vowels,33,1.0,1.5051153199747203
+s01,2026-06-04,all_vowels,S8 All vowels,34,1.0,1.45175577995833
+s01,2026-06-04,all_vowels,S8 All vowels,35,1.0,1.3775694399606437
+s01,2026-06-04,all_vowels,S8 All vowels,36,1.0,1.3465094899758696
+s01,2026-06-04,all_vowels,S8 All vowels,37,1.0,1.437535859993659
+s01,2026-06-04,all_vowels,S8 All vowels,38,1.0,1.4228770799702033
+s01,2026-06-04,basic_consonants,S1 Basic consonants,1,1.0,1.469796400051564
+s01,2026-06-04,basic_consonants,S1 Basic consonants,2,1.0,1.2494813499506563
+s01,2026-06-04,basic_consonants,S1 Basic consonants,3,1.0,1.0995048666372895
+s01,2026-06-04,basic_consonants,S1 Basic consonants,4,1.0,1.1407170000020415
+s01,2026-06-04,basic_consonants,S1 Basic consonants,5,1.0,1.0513536999933422
+s01,2026-06-04,basic_consonants,S1 Basic consonants,6,1.0,0.9796942666483422
+s01,2026-06-04,basic_consonants,S1 Basic consonants,7,1.0,0.9849417714202511
+s01,2026-06-04,basic_consonants,S1 Basic consonants,8,1.0,0.9559889374941122
+s01,2026-06-04,basic_consonants,S1 Basic consonants,9,1.0,0.9369707444372276
+s01,2026-06-04,basic_consonants,S1 Basic consonants,10,1.0,0.9141282999888063
+s01,2026-06-04,basic_consonants,S1 Basic consonants,11,1.0,0.8905580000020563
+s01,2026-06-04,basic_consonants,S1 Basic consonants,12,1.0,0.8546137400204316
+s01,2026-06-04,basic_consonants,S1 Basic consonants,13,1.0,0.8840609300183132
+s01,2026-06-04,basic_consonants,S1 Basic consonants,14,1.0,0.8227375900140033
+s01,2026-06-04,basic_vowels,S5 Basic vowels,1,1.0,1.2062248999718577
+s01,2026-06-04,basic_vowels,S5 Basic vowels,2,1.0,1.085433500004001
+s01,2026-06-04,basic_vowels,S5 Basic vowels,3,1.0,1.075474466662854
+s01,2026-06-04,basic_vowels,S5 Basic vowels,4,1.0,1.0835593999945559
+s01,2026-06-04,basic_vowels,S5 Basic vowels,5,1.0,1.0472737199626863
+s01,2026-06-04,basic_vowels,S5 Basic vowels,6,1.0,1.0165472332931433
+s01,2026-06-04,basic_vowels,S5 Basic vowels,7,1.0,0.9963407856744847
+s01,2026-06-04,basic_vowels,S5 Basic vowels,8,1.0,1.0532740499766078
+s01,2026-06-04,basic_vowels,S5 Basic vowels,9,1.0,1.0360024333155404
+s01,2026-06-04,basic_vowels,S5 Basic vowels,10,1.0,1.0264908199897036
+s01,2026-06-04,basic_vowels,S5 Basic vowels,11,1.0,0.9905646599829196
+s01,2026-06-04,basic_vowels,S5 Basic vowels,12,1.0,0.9814161199843511
+s01,2026-06-04,complex_vowels,S7 Complex vowels,1,1.0,1.863835999974981
+s01,2026-06-04,complex_vowels,S7 Complex vowels,2,1.0,1.8788258000276985
+s01,2026-06-04,complex_vowels,S7 Complex vowels,3,1.0,1.7942338667344302
+s01,2026-06-04,complex_vowels,S7 Complex vowels,4,1.0,1.9091410750406794
+s01,2026-06-04,complex_vowels,S7 Complex vowels,5,1.0,1.9782788000069558
+s01,2026-06-04,complex_vowels,S7 Complex vowels,6,1.0,2.0057259500414752
+s01,2026-06-04,complex_vowels,S7 Complex vowels,7,1.0,1.9731225143186748
+s01,2026-06-04,complex_vowels,S7 Complex vowels,8,1.0,1.9483641125261784
+s01,2026-06-04,complex_vowels,S7 Complex vowels,9,1.0,1.9291870888943474
+s01,2026-06-04,complex_vowels,S7 Complex vowels,10,1.0,1.895658929995261
+s01,2026-06-04,complex_vowels,S7 Complex vowels,11,1.0,1.856645689997822
+s01,2026-06-04,complex_vowels,S7 Complex vowels,12,1.0,1.8356636999873444
+s01,2026-06-04,complex_vowels,S7 Complex vowels,13,1.0,1.8294503499753774
+s01,2026-06-04,complex_vowels,S7 Complex vowels,14,1.0,1.775410689972341
+s01,2026-06-04,complex_vowels,S7 Complex vowels,15,1.0,1.7182742799865083
+s01,2026-06-04,complex_vowels,S7 Complex vowels,16,1.0,1.6603172399802133
+s01,2026-06-04,double_consonants,S3 Double consonants,1,1.0,1.0130119000095874
+s01,2026-06-04,double_consonants,S3 Double consonants,2,1.0,0.8976187000516802
+s01,2026-06-04,double_consonants,S3 Double consonants,3,1.0,0.9578663000526527
+s01,2026-06-04,double_consonants,S3 Double consonants,4,1.0,1.0043129000114277
+s01,2026-06-04,double_consonants,S3 Double consonants,5,1.0,0.9589031200390309
+s01,2026-06-04,double_consonants,S3 Double consonants,6,1.0,0.9556047167085732
+s01,2026-06-04,double_consonants,S3 Double consonants,7,1.0,0.9329103000595101
+s01,2026-06-04,double_consonants,S3 Double consonants,8,1.0,0.93186151253758
+s01,2026-06-04,double_consonants,S3 Double consonants,9,1.0,0.9153735778139284
+s01,2026-06-04,double_consonants,S3 Double consonants,10,1.0,0.9173850800376385
+s01,2026-06-04,double_vowels,S6 Double vowels,1,1.0,1.6006634999066591
+s01,2026-06-04,double_vowels,S6 Double vowels,2,1.0,1.5034342999570072
+s01,2026-06-04,double_vowels,S6 Double vowels,3,1.0,1.4249422999564558
+s01,2026-06-04,double_vowels,S6 Double vowels,4,1.0,1.380229074973613
+s01,2026-06-04,double_vowels,S6 Double vowels,5,1.0,1.351841040002182
+s01,2026-06-04,double_vowels,S6 Double vowels,6,1.0,1.338713716676769
+s01,2026-06-04,double_vowels,S6 Double vowels,7,1.0,1.3206715142753507
+s01,2026-06-04,double_vowels,S6 Double vowels,8,1.0,1.30971998750465
+s01,2026-06-04,double_vowels,S6 Double vowels,9,1.0,1.301729533355683
+s01,2026-06-04,double_vowels,S6 Double vowels,10,1.0,1.2965894700260834
+s01,2026-06-04,long_consonants,S2 Long consonants,1,1.0,0.8747293001506478
+s01,2026-06-04,long_consonants,S2 Long consonants,2,1.0,1.0548663000809029
+s01,2026-06-04,long_consonants,S2 Long consonants,3,1.0,1.2007114000152797
+s01,2026-06-04,long_consonants,S2 Long consonants,4,0.75,1.3510134000098333
+s01,2026-06-04,long_consonants,S2 Long consonants,5,0.8,1.2739384199958295
+s01,2026-06-04,long_consonants,S2 Long consonants,6,0.8333333333333334,1.3108738166823362
+s01,2026-06-04,long_consonants,S2 Long consonants,7,0.8571428571428571,1.284470857154312
+s01,2026-06-04,long_consonants,S2 Long consonants,8,0.875,1.3339714125031605
+s01,2026-06-04,long_consonants,S2 Long consonants,9,0.8888888888888888,1.2763405666531373
+s01,2026-06-04,long_consonants,S2 Long consonants,10,0.9,1.240640309988521
+s01,2026-06-04,long_consonants,S2 Long consonants,11,0.9,1.2425008999882265
+s01,2026-06-04,long_consonants,S2 Long consonants,12,0.9,1.2350646199891344
+s01,2026-06-04,long_consonants,S2 Long consonants,13,0.9,1.1829630800057203
+s01,2026-06-04,long_consonants,S2 Long consonants,14,1.0,1.084294140012935
+s01,2026-06-04,long_consonants,S2 Long consonants,15,1.0,1.0640188300283626
+s01,2026-06-04,long_consonants,S2 Long consonants,16,1.0,0.9801546399947256
+s01,2026-06-04,long_consonants,S2 Long consonants,17,1.0,0.9462666600011289
+s01,2026-06-04,long_consonants,S2 Long consonants,18,1.0,0.873103759996593
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,1,1.0,2.3512843002099544
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,2,1.0,2.3254760501440614
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,3,1.0,2.103270733496174
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,4,1.0,2.0384025251260027
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,5,1.0,1.9003205600660293
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,6,1.0,1.8237913833775867
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,7,1.0,1.7696126572056008
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,8,1.0,1.9503415875660721
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,9,1.0,1.9910143556125048
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,10,1.0,2.032359450054355
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,11,1.0,2.0529548400314526
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,12,1.0,2.192470910027623
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,13,1.0,2.288751590019092
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,14,1.0,2.3336715100100265
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,15,1.0,2.4712286200374365
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,16,1.0,2.4896589600481094
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,17,1.0,2.5019056800287216
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,18,1.0,2.336536360019818
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,19,1.0,2.32320294000674
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,20,1.0,2.275193879986182
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,21,1.0,2.364925069990568
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,22,1.0,2.308549929992296
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,23,1.0,2.2027849799953403
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,24,1.0,2.1321514700073747
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,25,1.0,2.1722435800125823
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,26,1.0,2.279312720010057
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,27,1.0,2.290634180000052
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,28,1.0,2.3819138600025327
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,29,1.0,2.455752020003274
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,30,1.0,2.5401049900101498
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,31,1.0,2.4711588100064548
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,32,1.0,2.4997098800027744
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,33,1.0,2.5357425899943338
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,34,1.0,2.534930059988983
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,35,1.0,2.3975963699864224
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,36,1.0,2.344639099971391
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,37,0.9,2.360975689976476
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,38,0.9,2.3573029299732298
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,39,0.9,2.336437140009366
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,40,0.9,2.216139530017972
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,41,0.9,2.1260456100106238
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,42,0.9,1.9372919700108469
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,43,0.9,1.959352989983745
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,44,0.9,1.9920728399883956
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,45,0.9,1.9872584599768743
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,46,0.9,1.9273454400012269
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,47,1.0,2.0304824599996207
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,48,1.0,2.0814126800047235
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,49,1.0,1.9678362499922515
+s01,2026-06-04,syllable_top50,S9 Syllable Top 50,50,1.0,1.9845463500125333

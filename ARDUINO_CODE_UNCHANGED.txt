@@ -1,0 +1,11 @@
+Hangul Tactile Designer Portable v8
+
+Arduino 코드는 사용자가 현재 쓰고 있는 버전을 그대로 사용합니다.
+새 firmware 업로드가 필요하지 않습니다.
+
+참고용 원본 사본:
+  korean2_no_relay_dual_device_18ch_softpwm.ino
+
+v8 프로그램은 raw serial command의 /i, /d를 고정 PWM 숫자로 바꾸지 않습니다.
+현재 Arduino dot-step 문법으로 표현할 수 없는 staggered overlap은 자동 변환하지 않고
+프로그램에서 명확한 설정 오류로 표시합니다.

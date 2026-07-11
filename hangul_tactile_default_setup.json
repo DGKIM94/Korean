@@ -1,0 +1,756 @@
+{
+  "setup_name": "Default Hangul Design",
+  "setup_version": 1,
+  "created_at": "2026-07-10T14:44:50",
+  "updated_at": "2026-07-10T14:44:50",
+  "baudrate": 115200,
+  "left_marker": "#",
+  "right_marker": "@",
+  "logical_to_motor": {
+    "1": 3,
+    "2": 2,
+    "3": 1,
+    "4": 6,
+    "5": 5,
+    "6": 4,
+    "7": 9,
+    "8": 8,
+    "9": 7
+  },
+  "default_composite_gap_ms": 350,
+  "cv_gap_ms": 450,
+  "cvc_cv_gap_ms": 450,
+  "cvc_vc_gap_ms": 450,
+  "compound_final_gap_ms": 350,
+  "inter_syllable_gap_ms": 350,
+  "inter_word_gap_ms": 650,
+  "inter_syllable_isi_ms": 350,
+  "inter_word_isi_ms": 650,
+  "cv_duration_split_ms": 300,
+  "motion_duration_split_ms": 300,
+  "cv_short_soa_ms": 450,
+  "cv_long_soa_ms": 700,
+  "cvc_cv_short_soa_ms": 450,
+  "cvc_cv_long_soa_ms": 700,
+  "use_duration_based_cv_soa": true,
+  "timing_semantics_version": 4,
+  "timing_defaults_ms": {
+    "composite": 350,
+    "cv": 450,
+    "cvc_cv": 450,
+    "cvc_vc": 450,
+    "compound_final": 350
+  },
+  "timing_matrix_ms": {},
+  "timing_pair_overrides_ms": {},
+  "jamo": {
+    "ㄱ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "기본 ㄱ",
+      "timing_class": "auto"
+    },
+    "ㄴ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 2,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "기본 ㄴ",
+      "timing_class": "auto"
+    },
+    "ㄷ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 3,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "기본 ㄷ",
+      "timing_class": "auto"
+    },
+    "ㅂ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 4,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "기본 ㅂ",
+      "timing_class": "auto"
+    },
+    "ㅅ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 6,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "기본 ㅅ",
+      "timing_class": "auto"
+    },
+    "ㅇ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 7,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "기본 ㅇ",
+      "timing_class": "auto"
+    },
+    "ㅈ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 9,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "기본 ㅈ",
+      "timing_class": "auto"
+    },
+    "ㅋ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 1,
+      "temporal": "L400",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "ㄱ 위치 긴 자극",
+      "timing_class": "auto"
+    },
+    "ㄹ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 2,
+      "temporal": "L400",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "ㄴ 위치 긴 자극",
+      "timing_class": "auto"
+    },
+    "ㅌ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 3,
+      "temporal": "L400",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "ㄷ 위치 긴 자극",
+      "timing_class": "auto"
+    },
+    "ㅍ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 4,
+      "temporal": "L400",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "ㅂ 위치 긴 자극",
+      "timing_class": "auto"
+    },
+    "ㅎ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 6,
+      "temporal": "L400",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "ㅅ 위치 긴 자극",
+      "timing_class": "auto"
+    },
+    "ㅁ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 7,
+      "temporal": "L400",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "ㅇ 위치 긴 자극",
+      "timing_class": "auto"
+    },
+    "ㅊ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 9,
+      "temporal": "L400",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "ㅈ 위치 긴 자극",
+      "timing_class": "auto"
+    },
+    "ㄲ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㄱ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㄱ",
+          "soa_before_ms": 350
+        }
+      ],
+      "raw_command": "",
+      "note": "ㄱ 반복",
+      "timing_class": "auto"
+    },
+    "ㄸ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㄷ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㄷ",
+          "soa_before_ms": 350
+        }
+      ],
+      "raw_command": "",
+      "note": "ㄷ 반복",
+      "timing_class": "auto"
+    },
+    "ㅃ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅂ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅂ",
+          "soa_before_ms": 350
+        }
+      ],
+      "raw_command": "",
+      "note": "ㅂ 반복",
+      "timing_class": "auto"
+    },
+    "ㅆ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅅ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅅ",
+          "soa_before_ms": 350
+        }
+      ],
+      "raw_command": "",
+      "note": "ㅅ 반복",
+      "timing_class": "auto"
+    },
+    "ㅉ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅈ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅈ",
+          "soa_before_ms": 350
+        }
+      ],
+      "raw_command": "",
+      "note": "ㅈ 반복",
+      "timing_class": "auto"
+    },
+    "ㅣ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 5,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "중앙 짧은 자극",
+      "timing_class": "auto"
+    },
+    "ㅡ": {
+      "mode": "atomic",
+      "arm": "left",
+      "position": 5,
+      "temporal": "L400",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "",
+      "note": "중앙 긴 자극",
+      "timing_class": "auto"
+    },
+    "ㅏ": {
+      "mode": "raw",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "#5/150.#5/d,4/i/100.#4/150",
+      "note": "중앙→motor4 motion",
+      "timing_class": "auto"
+    },
+    "ㅓ": {
+      "mode": "raw",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "#5/150.#5/d,6/i/100.#6/150",
+      "note": "중앙→motor6 motion",
+      "timing_class": "auto"
+    },
+    "ㅗ": {
+      "mode": "raw",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "#5/150.#5/d,2/i/100.#2/150",
+      "note": "중앙→motor2 motion",
+      "timing_class": "auto"
+    },
+    "ㅜ": {
+      "mode": "raw",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [],
+      "raw_command": "#5/150.#5/d,8/i/100.#8/150",
+      "note": "중앙→motor8 motion",
+      "timing_class": "auto"
+    },
+    "ㅢ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅡ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅣ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "ㅡ + ㅣ",
+      "timing_class": "auto"
+    },
+    "ㅑ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅏ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅏ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅕ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅓ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅓ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅛ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅗ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅗ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅠ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅜ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅜ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅐ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅏ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅣ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅔ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅓ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅣ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅒ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅑ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅣ",
+          "soa_before_ms": 650
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅖ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅕ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅣ",
+          "soa_before_ms": 650
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅘ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅗ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅏ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅙ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅗ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅏ",
+          "soa_before_ms": 550
+        },
+        {
+          "ref": "ㅣ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅚ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅗ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅣ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅝ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅜ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅓ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅞ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅜ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅓ",
+          "soa_before_ms": 550
+        },
+        {
+          "ref": "ㅣ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    },
+    "ㅟ": {
+      "mode": "composite",
+      "arm": "left",
+      "position": 1,
+      "temporal": "S200",
+      "on1_ms": 200,
+      "gap_ms": 100,
+      "on2_ms": 200,
+      "steps": [
+        {
+          "ref": "ㅜ",
+          "soa_before_ms": 0
+        },
+        {
+          "ref": "ㅣ",
+          "soa_before_ms": 550
+        }
+      ],
+      "raw_command": "",
+      "note": "",
+      "timing_class": "auto"
+    }
+  }
+}

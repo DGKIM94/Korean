@@ -1,0 +1,136 @@
+{
+  "package": "Hangul Tactile Designer Portable v8",
+  "entrypoint": "HangulTactileDesigner.exe",
+  "fallback_entrypoint": "START_HERE_HangulTactileDesigner.cmd",
+  "recommended_python": "64-bit Python 3.11 or 3.12",
+  "launcher_type": "Windows x86-64 bootstrap executable; source included",
+  "arduino_firmware": "Use existing firmware unchanged; reference copy: korean2_no_relay_dual_device_18ch_softpwm.ino",
+  "timing_semantics_version": 4,
+  "fixes": [
+    "Default consonant duration split changed to 300 ms",
+    "Move consonant duration threshold editing to the advanced SOA dialog",
+    "Add editable motion duration threshold",
+    "Split motion timing into short-motion and long-motion SOA matrix rows/columns",
+    "Classify motion using actual compiled duration",
+    "Preserve raw /i and /d commands with the existing Arduino dot syntax",
+    "Keep syllable and word boundaries as end-to-start ISI",
+    "Retain high-DPI scroll-layout fix"
+  ],
+  "files": [
+    {
+      "name": ".gitignore",
+      "size_bytes": 127,
+      "sha256": "ce90cb9a98a5604d31633ee9ca292850e60f976434789fd631f1aaaa7b1a8cd5"
+    },
+    {
+      "name": "ARDUINO_CODE_UNCHANGED.txt",
+      "size_bytes": 519,
+      "sha256": "7e78c2deee58e39d36bee8bf0642438cbbed6cde585cb16da97f650dce38ed58"
+    },
+    {
+      "name": "build_standalone_exe.bat",
+      "size_bytes": 781,
+      "sha256": "c7fec2153c580e59dc3658b272d71ea70c3cc00c8a112c7cc2a484c4b213eae1"
+    },
+    {
+      "name": "diagnose_environment.bat",
+      "size_bytes": 902,
+      "sha256": "4e035b1d8c72fefe23d1a19151f2d1dd1666cd53640aed75f427db23304930bc"
+    },
+    {
+      "name": "dual_device_temporal_controller.ino",
+      "size_bytes": 22476,
+      "sha256": "59dbcb538c973ab55cc2db1c3f31422d9f27932851c98f990eafd941c0822168"
+    },
+    {
+      "name": "hangul_tactile_default_setup.json",
+      "size_bytes": 15520,
+      "sha256": "94673e48b8a0ebab84baac67f45f7f46db34609fb1ecf4ec975d8487c5e7fa7d"
+    },
+    {
+      "name": "hangul_tactile_designer.py",
+      "size_bytes": 146731,
+      "sha256": "44ef5cde127ca236209c55a8b925bcd21eb99646c2ab15788698c44e2d67173f"
+    },
+    {
+      "name": "hangul_tactile_designer.spec",
+      "size_bytes": 1587,
+      "sha256": "0036f0ddd3625a95104e86e4dbcf474224e6ae65434f68e2719c481a1b175776"
+    },
+    {
+      "name": "hangul_voice_backend.py",
+      "size_bytes": 125173,
+      "sha256": "a8500d2bcd90d9dbd3a5b5d3716ca52f196c9d97b465fce0a9edff66f8eeb057"
+    },
+    {
+      "name": "HangulTactileDesigner.exe",
+      "size_bytes": 1806848,
+      "sha256": "4959e30d50e9e1957acd4dba095cb3493dd9809d73f1dfe0d15df01d4c283af5"
+    },
+    {
+      "name": "HangulTactileDesignerLauncher.go",
+      "size_bytes": 2769,
+      "sha256": "20d739332cd3cecfb959abea13dad52975fb7cbf6c278222a9103859b8230945"
+    },
+    {
+      "name": "install_hangul_tactile_designer.bat",
+      "size_bytes": 3842,
+      "sha256": "966e1b573daa523cb1a27c0e225ffd72e00831f1b1ef82e92aa11cc50de6138a"
+    },
+    {
+      "name": "korean2_no_relay_dual_device_18ch_softpwm.ino",
+      "size_bytes": 22476,
+      "sha256": "59dbcb538c973ab55cc2db1c3f31422d9f27932851c98f990eafd941c0822168"
+    },
+    {
+      "name": "korean2_no_relay_dual_device_18ch_softpwm_current.ino",
+      "size_bytes": 22476,
+      "sha256": "59dbcb538c973ab55cc2db1c3f31422d9f27932851c98f990eafd941c0822168"
+    },
+    {
+      "name": "launch_hangul_tactile_designer.py",
+      "size_bytes": 939,
+      "sha256": "4e256f683c7481ce06b708b3cd2dd3d3d55210ce4b81ae41f4e802df04c7c715"
+    },
+    {
+      "name": "README.md",
+      "size_bytes": 4342,
+      "sha256": "6621cc4fbd04ed0d39f067c23922c1f76191323d91633d3f84bf8ef564217a94"
+    },
+    {
+      "name": "requirements_hangul_tactile_designer.txt",
+      "size_bytes": 277,
+      "sha256": "4f4679f720646c4836d798231f51f9f7f8a6b6c4f6c271b3f86946c10e11d1fc"
+    },
+    {
+      "name": "reset_local_environment.bat",
+      "size_bytes": 427,
+      "sha256": "bdcc8178c5eb2acd9b709fedcccacbf9f3847e33af2853877b2164e98bee8489"
+    },
+    {
+      "name": "run_hangul_tactile_designer.bat",
+      "size_bytes": 62,
+      "sha256": "7e04fc5f17ef5a422924f2f8cb41652d3198385a61065603ab34faa6bf1ab23c"
+    },
+    {
+      "name": "run_hangul_tactile_designer_console.bat",
+      "size_bytes": 286,
+      "sha256": "1e0ee23afd9157a6f4ab1964ce7be1d354b5442532dd134322e85b8733604eaa"
+    },
+    {
+      "name": "START_HERE_HangulTactileDesigner.cmd",
+      "size_bytes": 946,
+      "sha256": "ebd7d2cd402cf791c072b38d79ae06ed62cc983c6bc651f599545b1a5f88ccac"
+    },
+    {
+      "name": "V8_VALIDATION.txt",
+      "size_bytes": 674,
+      "sha256": "549a52cda72326a553133cfddb8a44391e9fbe2f9465a1f8c94a92531ec827a1"
+    },
+    {
+      "name": "verify_hangul_tactile_install.py",
+      "size_bytes": 814,
+      "sha256": "1ed223b94c7151213d873db325c8de509e8513d66165c98c73275a62777e6189"
+    }
+  ]
+}

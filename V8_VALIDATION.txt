@@ -1,0 +1,13 @@
+Hangul Tactile Designer Portable v8 validation
+
+Validated:
+- Python source passes py_compile.
+- Default consonant duration split is 300 ms.
+- Consonant split threshold is editable in the advanced SOA dialog.
+- Motion duration split is editable in the advanced SOA dialog.
+- Advanced SOA matrix includes separate short-motion and long-motion rows/columns.
+- Motion class selection uses the actual compiled duration.
+- Raw #5/150.#5/d,4/i/100.#4/150 round-trips without PWM conversion.
+- Syllable and word boundaries remain end-to-start ISI.
+- Existing Arduino source is included unchanged.
+- Unsupported staggered overlap is reported rather than silently rewriting /i or /d.

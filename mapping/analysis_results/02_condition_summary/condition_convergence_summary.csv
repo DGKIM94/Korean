@@ -1,0 +1,7 @@
+﻿condition_name,n_subjects,n_subject_condition,n_learning_trials_mean,n_learning_trials_sem,accuracy_convergence_mean,accuracy_convergence_sem,rt_convergence_mean,rt_convergence_sem,last_trial_index_mean,condition_type
+C1_PhoneLike,1,1,37.0,,0.9259259259259259,,1.230345659982413,,37.0,High-schema
+C2_KeyboardLike,1,1,45.0,,0.9259259259259259,,1.5486114399507642,,45.0,High-schema
+C3_MediumA,1,1,43.0,,0.9259259259259259,,1.8090532200410963,,43.0,Medium-order
+C4_MediumB,1,1,54.0,,0.9259259259259259,,2.2818857799749823,,54.0,Medium-order
+C5_LowA,1,1,61.0,,0.9259259259259259,,1.7391521100420504,,61.0,Low-order
+C6_LowB,1,1,75.0,,0.9259259259259259,,1.3052615800173952,,75.0,Low-order

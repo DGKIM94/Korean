@@ -1,0 +1,3 @@
+﻿session_name,session_label,session_order,mean_accuracy,sem_accuracy,mean_rt,sem_rt,mean_trials,n_subject_days,n_subjects
+syllable_top50,S9 Syllable Top 50,9,0.96,0.011547005383792526,2.6324982213391923,0.2535394882387596,50.0,3,1
+syllable_top100,S10 Syllable Top 100,10,0.7878787878787878,0.0,2.5887385878824825,0.0,33.0,1,1
