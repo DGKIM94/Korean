@@ -7,8 +7,8 @@ A highly configurable Hangul tactile-code designer and tester.
 Core functions
 - Map each consonant/vowel to an atomic tactile stimulus, a composite of other
   jamo, or a raw serial script.
-- Configure duration-dependent CV/CVC onset-to-onset SOA and motion-length SOA.
-- Configure syllable and word boundaries as end-to-start ISI.
+- Configure every jamo/syllable transition as end-to-start ISI.
+- Configure syllable and word boundaries with the same ISI meaning.
 - Preserve the current Arduino dot syntax and raw /i, /d motion commands.
 - Save/load a complete setup as JSON.
 - Type a Hangul string such as "각" and immediately feel the compiled stimulus.
@@ -28,6 +28,7 @@ The app can run in DRY RUN mode without Arduino connection.
 
 from __future__ import annotations
 
+import copy
 import csv
 import hashlib
 import importlib.util
@@ -49,6 +50,7 @@ try:
     from PySide6.QtGui import QColor, QFont, QIcon
     from PySide6.QtWidgets import (
         QApplication,
+        QAbstractItemView,
         QCheckBox,
         QComboBox,
         QDialog,
@@ -67,6 +69,7 @@ try:
         QPlainTextEdit,
         QPushButton,
         QScrollArea,
+        QSizePolicy,
         QSpinBox,
         QStackedWidget,
         QTableWidget,
@@ -90,7 +93,7 @@ try:
 except Exception:
     load_workbook = None
 
-APP_VERSION = "Hangul Tactile Designer portable v8"
+APP_VERSION = "Hangul Tactile Designer portable v17"
 # APP_DIR is always the user-visible program folder. RESOURCE_DIR is where
 # bundled read-only files live when built with PyInstaller.
 if getattr(sys, "frozen", False):
@@ -147,6 +150,16 @@ TOGGLE_OFF_SVG = _write_ui_asset(
 
 CONSONANTS = list("ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ")
 VOWELS = list("ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ")
+
+# General text-answer quiz groups.  The vowel groups cover the complete
+# VOWELS list without overlap.  CVC uses only single final consonants because
+# the requested structure is consonant + vowel + consonant, not a compound
+# final such as ㄳ or ㄺ.
+BASIC_CONSONANTS = list("ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ")
+DOUBLE_CONSONANTS = list("ㄲㄸㅃㅆㅉ")
+BASIC_VOWELS = list("ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅛㅜㅠㅡㅣ")
+DIPHTHONG_VOWELS = list("ㅘㅙㅚㅝㅞㅟㅢ")
+SINGLE_FINAL_CONSONANTS = list("ㄱㄲㄴㄷㄹㅁㅂㅅㅆㅇㅈㅊㅋㅌㅍㅎ")
 COMPOUND_FINALS: Dict[str, List[str]] = {
     "ㄳ": ["ㄱ", "ㅅ"], "ㄵ": ["ㄴ", "ㅈ"], "ㄶ": ["ㄴ", "ㅎ"],
     "ㄺ": ["ㄹ", "ㄱ"], "ㄻ": ["ㄹ", "ㅁ"], "ㄼ": ["ㄹ", "ㅂ"],
@@ -157,6 +170,18 @@ COMPOUND_FINALS: Dict[str, List[str]] = {
 CHOSUNG = CONSONANTS
 JUNGSUNG = VOWELS
 JONGSUNG = [""] + list("ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ")
+
+
+def compose_hangul_syllable(cho: str, jung: str, jong: str = "") -> str:
+    """Compose one modern Hangul syllable from compatibility jamo."""
+    try:
+        cho_index = CHOSUNG.index(str(cho))
+        jung_index = JUNGSUNG.index(str(jung))
+        jong_index = JONGSUNG.index(str(jong))
+    except ValueError as exc:
+        raise ValueError(f"조합할 수 없는 자모입니다: {cho}{jung}{jong}") from exc
+    return chr(0xAC00 + (cho_index * 21 + jung_index) * 28 + jong_index)
+
 
 TEMPORAL_PRESETS = {
     "S200": {"label": "짧음 · 200 ms", "on1_ms": 200, "gap_ms": 0, "on2_ms": 0},
@@ -174,7 +199,7 @@ DEFAULT_LOGICAL_TO_MOTOR = {
 # ----------------------------- data model -----------------------------
 
 # Matrix classes. Motion is split automatically using its actual compiled
-# duration so a short and a long motion can use different SOA values.
+# duration so short and long motion can use different ISI values.
 TIMING_CLASS_LABELS: Dict[str, str] = {
     "short": "짧음",
     "long": "김",
@@ -211,8 +236,8 @@ BOUNDARY_ISI_DEFAULTS_MS: Dict[str, int] = {
     "inter_word": 650,
 }
 
-# Used only to create sensible defaults and migrate the previous ISI-based setup.
-# The actual duration is always calculated from the designed command/timeline.
+# Used only while migrating old onset-to-onset SOA setup files to the new
+# end-to-start ISI model. Runtime timing always uses the actual compiled duration.
 NOMINAL_TIMING_CLASS_DURATION_MS: Dict[str, int] = {
     "short": 200,
     "long": 400,
@@ -234,11 +259,9 @@ LEGACY_ISI_DEFAULTS_MS: Dict[str, int] = {
 
 
 def _default_timing_defaults_ms() -> Dict[str, int]:
-    # Defaults are SOA: previous onset -> next onset.
-    return {
-        ctx: NOMINAL_TIMING_CLASS_DURATION_MS["short"] + isi
-        for ctx, isi in LEGACY_ISI_DEFAULTS_MS.items()
-    }
+    # Every value is an end-to-start ISI: wait this long after the complete
+    # previous tactile stimulus has ended before starting the next stimulus.
+    return {ctx: int(isi) for ctx, isi in LEGACY_ISI_DEFAULTS_MS.items()}
 
 
 def _deep_copy_timing_matrix(src: Dict[str, Any]) -> Dict[str, Dict[str, Dict[str, int]]]:
@@ -262,8 +285,8 @@ def _expand_motion_duration_matrix(
 ) -> Dict[str, Dict[str, Dict[str, int]]]:
     """Upgrade the old single `motion` row/column to short/long motion.
 
-    Old setup files remain usable: both new motion classes inherit the old
-    motion cell until the user changes them in the advanced SOA dialog.
+    All matrix values are end-to-start ISIs. Old setup files remain usable:
+    both new motion classes inherit the old motion cell until edited.
     """
     copied = _deep_copy_timing_matrix(src)
     out: Dict[str, Dict[str, Dict[str, int]]] = {}
@@ -312,6 +335,7 @@ class JamoSpec:
     timing_class: str = "auto"
 
 
+
 @dataclass
 class DesignSetup:
     setup_name: str = "Default Hangul Design"
@@ -323,9 +347,8 @@ class DesignSetup:
     right_marker: str = "@"
     logical_to_motor: Dict[str, int] = field(default_factory=lambda: dict(DEFAULT_LOGICAL_TO_MOTOR))
 
-    # Retained only so old setup JSON files can be opened safely. In timing
-    # semantics v4 these fields are compatibility mirrors; the dedicated SOA
-    # and boundary-ISI fields below are authoritative.
+    # Legacy field names are retained only so old JSON files remain readable.
+    # In timing semantics v6 every internal transition is end-to-start ISI.
     default_composite_gap_ms: int = 150
     cv_gap_ms: int = 250
     cvc_cv_gap_ms: int = 250
@@ -334,43 +357,41 @@ class DesignSetup:
     inter_syllable_gap_ms: int = 350
     inter_word_gap_ms: int = 650
 
-    # v4: boundary timing is true end-to-start ISI.
     inter_syllable_isi_ms: int = 350
     inter_word_isi_ms: int = 650
 
-    # v4: ordinary consonants branch at 300 ms by default. The threshold is
-    # editable in the advanced SOA dialog. Raw motion stimuli have a separate
-    # duration threshold and use short-motion / long-motion matrix rows.
+    # Duration thresholds only select which ISI row is used. They never alter
+    # the meaning of the value: every selected value is still end-to-start ISI.
     cv_duration_split_ms: int = 300
     motion_duration_split_ms: int = 300
-    cv_short_soa_ms: int = 450
-    cv_long_soa_ms: int = 700
-    cvc_cv_short_soa_ms: int = 450
-    cvc_cv_long_soa_ms: int = 700
-    use_duration_based_cv_soa: bool = True
+    cv_short_isi_ms: int = 250
+    cv_long_isi_ms: int = 250
+    cvc_cv_short_isi_ms: int = 250
+    cvc_cv_long_isi_ms: int = 250
+    use_duration_based_cv_isi: bool = True
 
-    timing_semantics_version: int = 4
+    timing_semantics_version: int = 6
+    # The generic names are kept for file compatibility. In v6 these dictionaries
+    # store ISI values, not onset-to-onset SOA values.
     timing_defaults_ms: Dict[str, int] = field(default_factory=_default_timing_defaults_ms)
     timing_matrix_ms: Dict[str, Dict[str, Dict[str, int]]] = field(default_factory=dict)
     timing_pair_overrides_ms: Dict[str, int] = field(default_factory=dict)
     jamo: Dict[str, Dict[str, Any]] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
+        self.sync_duration_cv_fields_from_matrix()
         out = asdict(self)
         out["updated_at"] = datetime.now().isoformat(timespec="seconds")
-        # Mirror SOA defaults into the legacy-named fields so the JSON remains
-        # understandable to a human. timing_semantics_version=4 is authoritative.
+
+        # Keep the familiar gap names synchronized for older analysis scripts.
         out["default_composite_gap_ms"] = int(self.timing_defaults_ms.get("composite", 0))
         out["cv_gap_ms"] = int(self.timing_defaults_ms.get("cv", 0))
         out["cvc_cv_gap_ms"] = int(self.timing_defaults_ms.get("cvc_cv", 0))
         out["cvc_vc_gap_ms"] = int(self.timing_defaults_ms.get("cvc_vc", 0))
         out["compound_final_gap_ms"] = int(self.timing_defaults_ms.get("compound_final", 0))
-        # Legacy field names are retained for older tools, but in v4 they
-        # mirror the true boundary ISI values.
         out["inter_syllable_gap_ms"] = int(self.inter_syllable_isi_ms)
         out["inter_word_gap_ms"] = int(self.inter_word_isi_ms)
-        # Remove obsolete v2 boundary-SOA entries so a saved v4 JSON has only
-        # one unambiguous representation of syllable/word boundary timing.
+
         out["timing_defaults_ms"] = {
             k: int(v) for k, v in self.timing_defaults_ms.items()
             if k in TIMING_CONTEXT_LABELS
@@ -385,119 +406,345 @@ class DesignSetup:
         }
         return out
 
+    @staticmethod
+    def _legacy_step_duration_ms(step: str) -> int:
+        durations = [int(x) for x in re.findall(r"/(\d+)", str(step))]
+        low = str(step).lower()
+        if re.search(r"/[s](?:@|#|$)", low):
+            durations.append(200)
+        if re.search(r"/[l](?:@|#|$)", low):
+            durations.append(400)
+        if re.search(r"/[r](?:@|#|$)", low):
+            durations.append(500)
+        return max(durations) if durations else 0
+
+    @classmethod
+    def _legacy_raw_duration_ms(cls, command: str) -> int:
+        current_onset = 0
+        final_end = 0
+        for original_step in str(command).split("."):
+            step = original_step.strip()
+            if not step:
+                continue
+            if re.fullmatch(r"0/(\d+)", step):
+                current_onset += int(step.split("/", 1)[1])
+                final_end = max(final_end, current_onset)
+                continue
+            duration = cls._legacy_step_duration_ms(step)
+            final_end = max(final_end, current_onset + duration)
+            current_onset += duration
+        return int(final_end)
+
+    @classmethod
+    def _legacy_jamo_duration_ms(
+        cls,
+        label: str,
+        jamo_data: Dict[str, Dict[str, Any]],
+        previous_version: int,
+        memo: Optional[Dict[str, int]] = None,
+        stack: Optional[List[str]] = None,
+    ) -> int:
+        memo = memo if memo is not None else {}
+        stack = list(stack or [])
+        if label in memo:
+            return int(memo[label])
+        if label in stack:
+            return NOMINAL_TIMING_CLASS_DURATION_MS["composite"]
+        if label in COMPOUND_FINALS and label not in jamo_data:
+            total = 0
+            for index, component in enumerate(COMPOUND_FINALS[label]):
+                duration = cls._legacy_jamo_duration_ms(
+                    component, jamo_data, previous_version, memo, stack + [label]
+                )
+                if index > 0:
+                    total += LEGACY_ISI_DEFAULTS_MS["compound_final"]
+                total += duration
+            memo[label] = int(total)
+            return int(total)
+
+        raw = jamo_data.get(label, {"mode": "unmapped"})
+        if not isinstance(raw, dict):
+            return 0
+        mode = str(raw.get("mode", "unmapped"))
+        if mode == "atomic":
+            temporal = str(raw.get("temporal", "S200"))
+            preset = TEMPORAL_PRESETS.get(temporal, TEMPORAL_PRESETS["CUSTOM"])
+            if temporal == "CUSTOM":
+                on1 = int(raw.get("on1_ms", 200))
+                gap = int(raw.get("gap_ms", 100))
+                on2 = int(raw.get("on2_ms", 200))
+            else:
+                on1 = int(preset["on1_ms"])
+                gap = int(preset["gap_ms"])
+                on2 = int(preset["on2_ms"])
+            duration = on1 + (max(0, gap) + on2 if on2 > 0 else 0)
+        elif mode == "raw":
+            duration = cls._legacy_raw_duration_ms(str(raw.get("raw_command", "")))
+        elif mode == "composite":
+            onset = 0
+            final_end = 0
+            previous_ref = ""
+            steps = raw.get("steps") or []
+            for index, step in enumerate(steps):
+                if not isinstance(step, dict):
+                    continue
+                ref = str(step.get("ref", "")).strip()
+                ref_duration = cls._legacy_jamo_duration_ms(
+                    ref, jamo_data, previous_version, memo, stack + [label]
+                )
+                if index > 0:
+                    if "isi_before_ms" in step:
+                        onset += cls._legacy_jamo_duration_ms(
+                            previous_ref, jamo_data, previous_version, memo, stack + [label]
+                        ) + max(0, int(step.get("isi_before_ms", 0)))
+                    elif previous_version < 2 and "gap_before_ms" in step:
+                        onset += cls._legacy_jamo_duration_ms(
+                            previous_ref, jamo_data, previous_version, memo, stack + [label]
+                        ) + max(0, int(step.get("gap_before_ms", 0)))
+                    elif "legacy_isi_ms" in step:
+                        onset += cls._legacy_jamo_duration_ms(
+                            previous_ref, jamo_data, previous_version, memo, stack + [label]
+                        ) + max(0, int(step.get("legacy_isi_ms", 0)))
+                    else:
+                        onset += max(0, int(step.get(
+                            "soa_before_ms",
+                            step.get("gap_before_ms", 0),
+                        )))
+                final_end = max(final_end, onset + ref_duration)
+                previous_ref = ref
+            duration = final_end
+        else:
+            duration = 0
+        memo[label] = max(0, int(duration))
+        return memo[label]
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "DesignSetup":
         original = dict(data or {})
+        previous_version = int(original.get("timing_semantics_version", 1) or 1)
+
         allowed = {f.name for f in cls.__dataclass_fields__.values()}
         clean = {k: v for k, v in original.items() if k in allowed}
         obj = cls(**clean)
         obj.logical_to_motor = {str(k): int(v) for k, v in obj.logical_to_motor.items()}
-        obj.timing_defaults_ms = {
-            **_default_timing_defaults_ms(),
-            **{str(k): int(v) for k, v in (obj.timing_defaults_ms or {}).items()},
-        }
-        obj.timing_matrix_ms = _deep_copy_timing_matrix(obj.timing_matrix_ms)
-        obj.timing_pair_overrides_ms = {
-            str(k): int(v) for k, v in (obj.timing_pair_overrides_ms or {}).items()
-        }
+        obj.jamo = copy.deepcopy(obj.jamo or {})
 
-        previous_version = int(original.get("timing_semantics_version", 1) or 1)
-        if previous_version < 2:
-            obj._migrate_legacy_isi_to_soa(original)
+        # Boundary fields were already true ISI in v4/v5. Earlier v2/v3 files
+        # stored boundary onset-to-onset values and need the old nominal 200 ms
+        # subtraction to recover an approximate physical gap.
+        if "inter_syllable_isi_ms" in original:
+            obj.inter_syllable_isi_ms = max(0, int(original["inter_syllable_isi_ms"]))
+        elif previous_version < 2:
+            obj.inter_syllable_isi_ms = max(0, int(original.get("inter_syllable_gap_ms", 350)))
         else:
-            obj._normalize_composite_step_keys()
+            old_boundary = int((original.get("timing_defaults_ms") or {}).get(
+                "inter_syllable", original.get("inter_syllable_gap_ms", 550)
+            ))
+            obj.inter_syllable_isi_ms = max(0, old_boundary - 200)
 
-        # v1 stored boundary values as ISI. v2 stored them as SOA measured from
-        # the previous last-jamo onset, so subtract the old nominal 200 ms jamo
-        # duration to recover the prior physical gap as closely as possible.
-        if "inter_syllable_isi_ms" not in original:
-            if previous_version < 2:
-                obj.inter_syllable_isi_ms = max(0, int(original.get("inter_syllable_gap_ms", 350)))
-            else:
-                old_soa = int((original.get("timing_defaults_ms") or {}).get(
-                    "inter_syllable", original.get("inter_syllable_gap_ms", 550)
-                ))
-                obj.inter_syllable_isi_ms = max(0, old_soa - NOMINAL_TIMING_CLASS_DURATION_MS["short"])
-        if "inter_word_isi_ms" not in original:
-            if previous_version < 2:
-                obj.inter_word_isi_ms = max(0, int(original.get("inter_word_gap_ms", 650)))
-            else:
-                old_soa = int((original.get("timing_defaults_ms") or {}).get(
-                    "inter_word", original.get("inter_word_gap_ms", 850)
-                ))
-                obj.inter_word_isi_ms = max(0, old_soa - NOMINAL_TIMING_CLASS_DURATION_MS["short"])
+        if "inter_word_isi_ms" in original:
+            obj.inter_word_isi_ms = max(0, int(original["inter_word_isi_ms"]))
+        elif previous_version < 2:
+            obj.inter_word_isi_ms = max(0, int(original.get("inter_word_gap_ms", 650)))
+        else:
+            old_boundary = int((original.get("timing_defaults_ms") or {}).get(
+                "inter_word", original.get("inter_word_gap_ms", 850)
+            ))
+            obj.inter_word_isi_ms = max(0, old_boundary - 200)
 
-        # Existing v1/v2 setups had one CV SOA. Keep their behavior unchanged
-        # until the user explicitly gives short/long consonants different values.
-        if "cv_short_soa_ms" not in original:
-            obj.cv_short_soa_ms = int(obj.timing_defaults_ms.get("cv", 450))
-        if "cv_long_soa_ms" not in original:
-            obj.cv_long_soa_ms = int(obj.cv_short_soa_ms)
-        if "cvc_cv_short_soa_ms" not in original:
-            obj.cvc_cv_short_soa_ms = int(obj.timing_defaults_ms.get("cvc_cv", 450))
-        if "cvc_cv_long_soa_ms" not in original:
-            obj.cvc_cv_long_soa_ms = int(obj.cvc_cv_short_soa_ms)
+        if previous_version >= 6:
+            obj.timing_defaults_ms = {
+                **_default_timing_defaults_ms(),
+                **{str(k): max(0, int(v)) for k, v in (obj.timing_defaults_ms or {}).items()},
+            }
+            obj.timing_matrix_ms = _expand_motion_duration_matrix(
+                _deep_copy_timing_matrix(obj.timing_matrix_ms),
+                obj.timing_defaults_ms,
+            )
+            obj.timing_pair_overrides_ms = {
+                str(k): max(0, int(v))
+                for k, v in (obj.timing_pair_overrides_ms or {}).items()
+                if str(k).split("|", 1)[0] in TIMING_CONTEXT_LABELS
+            }
+            obj._normalize_composite_step_keys_to_isi(previous_version)
+            obj.sync_duration_cv_fields_from_matrix()
+            obj.timing_semantics_version = 6
+            obj.use_duration_based_cv_isi = True
+            return obj
 
-        # v4 uses dedicated ISI fields for text boundaries; remove stale v2
-        # boundary entries after they have been migrated.
-        obj.timing_defaults_ms = {
-            k: int(v) for k, v in obj.timing_defaults_ms.items()
-            if k in TIMING_CONTEXT_LABELS
-        }
-        obj.timing_matrix_ms = {
-            k: v for k, v in obj.timing_matrix_ms.items()
-            if k in TIMING_CONTEXT_LABELS
-        }
-        obj.timing_pair_overrides_ms = {
-            k: int(v) for k, v in obj.timing_pair_overrides_ms.items()
-            if k.split("|", 1)[0] in TIMING_CONTEXT_LABELS
-        }
-        obj.timing_matrix_ms = _expand_motion_duration_matrix(
-            obj.timing_matrix_ms, obj.timing_defaults_ms
-        )
-        obj.timing_semantics_version = 4
-        return obj
-
-    def _normalize_composite_step_keys(self) -> None:
-        for raw_spec in self.jamo.values():
-            if not isinstance(raw_spec, dict):
-                continue
-            steps = raw_spec.get("steps") or []
-            for index, step in enumerate(steps):
-                if not isinstance(step, dict):
-                    continue
-                if "soa_before_ms" not in step:
-                    step["soa_before_ms"] = int(step.get("gap_before_ms", 0 if index == 0 else self.timing_defaults_ms["composite"]))
-                step.pop("gap_before_ms", None)
-
-    def _migrate_legacy_isi_to_soa(self, original: Dict[str, Any]) -> None:
-        legacy = {
+        legacy_jamo = copy.deepcopy(obj.jamo)
+        legacy_defaults = {
             "composite": int(original.get("default_composite_gap_ms", 150)),
             "cv": int(original.get("cv_gap_ms", 250)),
             "cvc_cv": int(original.get("cvc_cv_gap_ms", 250)),
             "cvc_vc": int(original.get("cvc_vc_gap_ms", 250)),
             "compound_final": int(original.get("compound_final_gap_ms", 150)),
         }
-        self.inter_syllable_isi_ms = max(0, int(original.get("inter_syllable_gap_ms", 350)))
-        self.inter_word_isi_ms = max(0, int(original.get("inter_word_gap_ms", 650)))
-        self.timing_defaults_ms = {
-            ctx: NOMINAL_TIMING_CLASS_DURATION_MS["short"] + isi
-            for ctx, isi in legacy.items()
-        }
-        self.timing_matrix_ms = {}
-        for ctx, isi in legacy.items():
-            self.timing_matrix_ms[ctx] = {}
-            for prev_cls in TIMING_CLASS_LABELS:
-                soa = NOMINAL_TIMING_CLASS_DURATION_MS.get(prev_cls, 300) + isi
-                self.timing_matrix_ms[ctx][prev_cls] = {
-                    next_cls: int(soa) for next_cls in TIMING_CLASS_LABELS
-                }
 
-        # Previous composite rows stored an ISI after the previous referenced
-        # jamo. Convert it to an approximate onset-to-onset value using the
-        # previous jamo's timing class. This keeps old setups close to their old
-        # physical timing while switching them to SOA semantics.
-        for raw_spec in self.jamo.values():
+        if previous_version < 2:
+            # The oldest setup format already used end-to-start gaps.
+            obj.timing_defaults_ms = {
+                context: max(0, int(legacy_defaults[context]))
+                for context in TIMING_CONTEXT_LABELS
+            }
+            obj.timing_matrix_ms = {
+                context: {
+                    prev_cls: {
+                        next_cls: int(obj.timing_defaults_ms[context])
+                        for next_cls in TIMING_CLASS_LABELS
+                    }
+                    for prev_cls in TIMING_CLASS_LABELS
+                }
+                for context in TIMING_CONTEXT_LABELS
+            }
+            obj.timing_pair_overrides_ms = {
+                str(k): max(0, int(v))
+                for k, v in (original.get("timing_pair_overrides_ms") or {}).items()
+            }
+        else:
+            # v2-v5 stored onset-to-onset SOA. Switching to ISI is also a
+            # simplification step: each non-CV context is collapsed to one clear
+            # end-to-start gap based on the old short-row/default value. This
+            # avoids carrying the old class-dependent overlap complexity into
+            # the new model.
+            old_defaults_raw = {
+                **{
+                    context: NOMINAL_TIMING_CLASS_DURATION_MS["short"]
+                    + LEGACY_ISI_DEFAULTS_MS[context]
+                    for context in TIMING_CONTEXT_LABELS
+                },
+                **{
+                    str(k): int(v)
+                    for k, v in (original.get("timing_defaults_ms") or {}).items()
+                    if str(k) in TIMING_CONTEXT_LABELS
+                },
+            }
+            converted_defaults = {
+                context: max(0, int(old_defaults_raw[context]) - 200)
+                for context in TIMING_CONTEXT_LABELS
+            }
+            converted_matrix: Dict[str, Dict[str, Dict[str, int]]] = {
+                context: {
+                    prev_cls: {
+                        next_cls: int(converted_defaults[context])
+                        for next_cls in TIMING_CLASS_LABELS
+                    }
+                    for prev_cls in TIMING_CLASS_LABELS
+                }
+                for context in TIMING_CONTEXT_LABELS
+            }
+
+            # The four visible CV/CVC controls were the authoritative values in
+            # older versions. Preserve their approximate physical gaps.
+            old_cv_short = int(original.get(
+                "cv_short_soa_ms", old_defaults_raw.get("cv", 450)
+            ))
+            old_cv_long = int(original.get("cv_long_soa_ms", old_cv_short))
+            old_cvc_short = int(original.get(
+                "cvc_cv_short_soa_ms", old_defaults_raw.get("cvc_cv", 450)
+            ))
+            old_cvc_long = int(original.get("cvc_cv_long_soa_ms", old_cvc_short))
+            converted_rows = {
+                ("cv", "short"): max(0, old_cv_short - 200),
+                ("cv", "long"): max(0, old_cv_long - 400),
+                ("cvc_cv", "short"): max(0, old_cvc_short - 200),
+                ("cvc_cv", "long"): max(0, old_cvc_long - 400),
+            }
+            for (context, prev_cls), value in converted_rows.items():
+                for next_cls in TIMING_CLASS_LABELS:
+                    converted_matrix[context][prev_cls][next_cls] = int(value)
+
+            obj.timing_matrix_ms = converted_matrix
+            obj.timing_defaults_ms = {
+                context: int(converted_defaults[context])
+                for context in TIMING_CONTEXT_LABELS
+            }
+            obj.timing_defaults_ms["cv"] = int(converted_rows[("cv", "short")])
+            obj.timing_defaults_ms["cvc_cv"] = int(converted_rows[("cvc_cv", "short")])
+
+            memo: Dict[str, int] = {}
+            converted_overrides: Dict[str, int] = {}
+            for key, value in (original.get("timing_pair_overrides_ms") or {}).items():
+                parts = str(key).split("|", 2)
+                if len(parts) != 3 or parts[0] not in TIMING_CONTEXT_LABELS:
+                    continue
+                previous_duration = cls._legacy_jamo_duration_ms(
+                    parts[1], legacy_jamo, previous_version, memo
+                )
+                if previous_duration <= 0:
+                    previous_class = obj.timing_class_for(parts[1])
+                    previous_duration = int(
+                        NOMINAL_TIMING_CLASS_DURATION_MS.get(previous_class, 300)
+                    )
+                converted_overrides[str(key)] = max(0, int(value) - previous_duration)
+            obj.timing_pair_overrides_ms = converted_overrides
+
+        obj._normalize_composite_step_keys_to_isi(
+            previous_version,
+            legacy_jamo=legacy_jamo,
+        )
+        obj.timing_matrix_ms = _expand_motion_duration_matrix(
+            obj.timing_matrix_ms, obj.timing_defaults_ms
+        )
+        obj.sync_duration_cv_fields_from_matrix()
+        obj.timing_semantics_version = 6
+        obj.use_duration_based_cv_isi = True
+        return obj
+
+    def ensure_timing_matrix(self) -> None:
+        self.timing_matrix_ms = _expand_motion_duration_matrix(
+            self.timing_matrix_ms, self.timing_defaults_ms
+        )
+
+    def set_uniform_timing_row(self, context: str, prev_cls: str, value: int) -> None:
+        """Set one complete previous-stimulus row to a single ISI value."""
+        self.ensure_timing_matrix()
+        if context not in TIMING_CONTEXT_LABELS or prev_cls not in TIMING_CLASS_LABELS:
+            return
+        row = self.timing_matrix_ms[context].setdefault(prev_cls, {})
+        for next_cls in TIMING_CLASS_LABELS:
+            row[next_cls] = max(0, int(value))
+
+    def uniform_timing_row_value(self, context: str, prev_cls: str, fallback: int) -> int:
+        self.ensure_timing_matrix()
+        row = self.timing_matrix_ms.get(context, {}).get(prev_cls, {})
+        for next_cls in TIMING_CLASS_LABELS:
+            if next_cls in row:
+                return max(0, int(row[next_cls]))
+        return max(0, int(fallback))
+
+    def sync_duration_cv_rows_from_fields(self) -> None:
+        self.set_uniform_timing_row("cv", "short", self.cv_short_isi_ms)
+        self.set_uniform_timing_row("cv", "long", self.cv_long_isi_ms)
+        self.set_uniform_timing_row("cvc_cv", "short", self.cvc_cv_short_isi_ms)
+        self.set_uniform_timing_row("cvc_cv", "long", self.cvc_cv_long_isi_ms)
+        self.timing_defaults_ms["cv"] = max(0, int(self.cv_short_isi_ms))
+        self.timing_defaults_ms["cvc_cv"] = max(0, int(self.cvc_cv_short_isi_ms))
+
+    def sync_duration_cv_fields_from_matrix(self) -> None:
+        self.cv_short_isi_ms = self.uniform_timing_row_value(
+            "cv", "short", self.cv_short_isi_ms
+        )
+        self.cv_long_isi_ms = self.uniform_timing_row_value(
+            "cv", "long", self.cv_long_isi_ms
+        )
+        self.cvc_cv_short_isi_ms = self.uniform_timing_row_value(
+            "cvc_cv", "short", self.cvc_cv_short_isi_ms
+        )
+        self.cvc_cv_long_isi_ms = self.uniform_timing_row_value(
+            "cvc_cv", "long", self.cvc_cv_long_isi_ms
+        )
+        self.timing_defaults_ms["cv"] = int(self.cv_short_isi_ms)
+        self.timing_defaults_ms["cvc_cv"] = int(self.cvc_cv_short_isi_ms)
+
+    def _normalize_composite_step_keys_to_isi(
+        self,
+        previous_version: int,
+        legacy_jamo: Optional[Dict[str, Dict[str, Any]]] = None,
+    ) -> None:
+        legacy_jamo = copy.deepcopy(legacy_jamo if legacy_jamo is not None else self.jamo)
+        memo: Dict[str, int] = {}
+        for owner_label, raw_spec in self.jamo.items():
             if not isinstance(raw_spec, dict):
                 continue
             steps = raw_spec.get("steps") or []
@@ -505,31 +752,33 @@ class DesignSetup:
             for index, step in enumerate(steps):
                 if not isinstance(step, dict):
                     continue
-                ref = str(step.get("ref", ""))
                 if index == 0:
-                    step["soa_before_ms"] = 0
+                    isi = 0
+                elif "isi_before_ms" in step:
+                    isi = max(0, int(step.get("isi_before_ms", 0)))
+                elif previous_version < 2 and "gap_before_ms" in step:
+                    isi = max(0, int(step.get("gap_before_ms", 0)))
+                elif "legacy_isi_ms" in step:
+                    isi = max(0, int(step.get("legacy_isi_ms", 0)))
                 else:
-                    old_isi = int(step.get("gap_before_ms", legacy["composite"]))
-                    prev_cls = self.timing_class_for(previous_ref)
-                    step["soa_before_ms"] = NOMINAL_TIMING_CLASS_DURATION_MS.get(prev_cls, 300) + old_isi
+                    old_soa = int(step.get(
+                        "soa_before_ms",
+                        step.get("gap_before_ms", self.timing_defaults_ms.get("composite", 0)),
+                    ))
+                    previous_duration = self._legacy_jamo_duration_ms(
+                        previous_ref, legacy_jamo, previous_version, memo, [owner_label]
+                    )
+                    if previous_duration <= 0:
+                        previous_class = self.timing_class_for(previous_ref)
+                        previous_duration = int(
+                            NOMINAL_TIMING_CLASS_DURATION_MS.get(previous_class, 300)
+                        )
+                    isi = max(0, old_soa - previous_duration)
+                step["isi_before_ms"] = int(isi)
+                step.pop("soa_before_ms", None)
                 step.pop("gap_before_ms", None)
-                previous_ref = ref
-
-    def seed_timing_matrix_from_legacy_isi(self, legacy: Optional[Dict[str, int]] = None) -> None:
-        legacy = dict(legacy or LEGACY_ISI_DEFAULTS_MS)
-        self.timing_defaults_ms = {
-            ctx: NOMINAL_TIMING_CLASS_DURATION_MS["short"] + int(legacy.get(ctx, 0))
-            for ctx in TIMING_CONTEXT_LABELS
-        }
-        self.timing_matrix_ms = {}
-        for ctx in TIMING_CONTEXT_LABELS:
-            isi = int(legacy.get(ctx, 0))
-            self.timing_matrix_ms[ctx] = {}
-            for prev_cls in TIMING_CLASS_LABELS:
-                soa = NOMINAL_TIMING_CLASS_DURATION_MS.get(prev_cls, 300) + isi
-                self.timing_matrix_ms[ctx][prev_cls] = {
-                    next_cls: int(soa) for next_cls in TIMING_CLASS_LABELS
-                }
+                step.pop("legacy_isi_ms", None)
+                previous_ref = str(step.get("ref", "")).strip()
 
     def get_spec(self, label: str) -> JamoSpec:
         raw = self.jamo.get(label, {"mode": "unmapped"})
@@ -587,7 +836,7 @@ class DesignSetup:
     def pair_override_key(context: str, from_label: str, to_label: str) -> str:
         return f"{context}|{from_label}|{to_label}"
 
-    def resolve_soa_ms(
+    def resolve_isi_ms(
         self,
         context: str,
         from_label: str,
@@ -595,7 +844,6 @@ class DesignSetup:
         from_duration_ms: Optional[int] = None,
         to_duration_ms: Optional[int] = None,
     ) -> int:
-        # A specific jamo pair always wins.
         pair_key = self.pair_override_key(context, from_label, to_label)
         if pair_key in self.timing_pair_overrides_ms:
             return max(0, int(self.timing_pair_overrides_ms[pair_key]))
@@ -605,19 +853,17 @@ class DesignSetup:
         prev_cls = self.refined_timing_class(prev_base, from_duration_ms)
         next_cls = self.refined_timing_class(next_base, to_duration_ms)
 
-        # Ordinary consonants use the dedicated actual-duration CV rule. A raw
-        # motion consonant instead uses the short/long motion rows in the
-        # advanced matrix, so motion length can have its own SOA.
         if (
-            self.use_duration_based_cv_soa
+            self.use_duration_based_cv_isi
+            and context in ("cv", "cvc_cv")
             and from_duration_ms is not None
             and prev_base not in ("motion", "motion_short", "motion_long")
         ):
-            is_short = int(from_duration_ms) <= int(self.cv_duration_split_ms)
-            if context == "cv":
-                return max(0, int(self.cv_short_soa_ms if is_short else self.cv_long_soa_ms))
-            if context == "cvc_cv":
-                return max(0, int(self.cvc_cv_short_soa_ms if is_short else self.cvc_cv_long_soa_ms))
+            prev_cls = (
+                "short"
+                if int(from_duration_ms) <= int(self.cv_duration_split_ms)
+                else "long"
+            )
 
         try:
             return max(0, int(self.timing_matrix_ms[context][prev_cls][next_cls]))
@@ -648,11 +894,11 @@ class TimelineEvent:
 class HangulCompiler:
     """Compile Hangul into a tactile timeline for the current Arduino code.
 
-    Raw ``/i`` and ``/d`` motion commands are preserved. The current Arduino
-    dot syntax can represent sequential steps and equal-onset simultaneous
-    steps, but not a new staggered onset before a prior step has ended. Such an
-    unsupported overlap is reported instead of silently converting ramps to
-    fixed PWM values.
+    Raw ``/i`` and ``/d`` motion commands are preserved. Every generated
+    transition uses end-to-start ISI, so the next jamo begins only after the
+    complete previous tactile stimulus has ended and the configured ISI has
+    elapsed. This remains fully representable by the unchanged Arduino dot
+    syntax without overlap exceptions.
     """
 
     def __init__(self, setup: DesignSetup):
@@ -751,11 +997,12 @@ class HangulCompiler:
                 comp_events = self.compile_jamo_timeline(comp, stack + [label])
                 comp_duration = self.timeline_duration_ms(comp_events)
                 if index > 0:
-                    onset += self.setup.resolve_soa_ms(
+                    isi = self.setup.resolve_isi_ms(
                         "compound_final", previous, comp,
                         from_duration_ms=previous_duration,
                         to_duration_ms=comp_duration,
                     )
+                    onset += int(previous_duration or 0) + max(0, int(isi))
                 events.extend(self._shift(comp_events, onset))
                 previous = comp
                 previous_duration = comp_duration
@@ -782,17 +1029,15 @@ class HangulCompiler:
                 ref_events = self.compile_jamo_timeline(ref, stack + [label])
                 ref_duration = self.timeline_duration_ms(ref_events)
                 if index > 0:
-                    if "soa_before_ms" in step:
-                        soa = int(step.get("soa_before_ms", 0))
-                    elif "gap_before_ms" in step:  # last-resort compatibility
-                        soa = int(step.get("gap_before_ms", 0))
+                    if "isi_before_ms" in step:
+                        isi = int(step.get("isi_before_ms", 0))
                     else:
-                        soa = self.setup.resolve_soa_ms(
+                        isi = self.setup.resolve_isi_ms(
                             "composite", previous_ref, ref,
                             from_duration_ms=previous_duration,
                             to_duration_ms=ref_duration,
                         )
-                    onset += max(0, soa)
+                    onset += int(previous_duration or 0) + max(0, int(isi))
                 events.extend(self._shift(ref_events, onset))
                 previous_ref = ref
                 previous_duration = ref_duration
@@ -810,11 +1055,12 @@ class HangulCompiler:
         jung_events = self.compile_jamo_timeline(jung)
         cho_duration = self.timeline_duration_ms(cho_events)
         jung_duration = self.timeline_duration_ms(jung_events)
-        jung_onset = self.setup.resolve_soa_ms(
+        jung_isi = self.setup.resolve_isi_ms(
             "cvc_cv" if jong else "cv", cho, jung,
             from_duration_ms=cho_duration,
             to_duration_ms=jung_duration,
         )
+        jung_onset = cho_duration + max(0, int(jung_isi))
         events = list(cho_events)
         events.extend(self._shift(jung_events, jung_onset))
         last_label = jung
@@ -822,11 +1068,12 @@ class HangulCompiler:
         if jong:
             jong_events = self.compile_jamo_timeline(jong)
             jong_duration = self.timeline_duration_ms(jong_events)
-            jong_onset = jung_onset + self.setup.resolve_soa_ms(
+            jong_isi = self.setup.resolve_isi_ms(
                 "cvc_vc", jung, jong,
                 from_duration_ms=jung_duration,
                 to_duration_ms=jong_duration,
             )
+            jong_onset = jung_onset + jung_duration + max(0, int(jong_isi))
             events.extend(self._shift(jong_events, jong_onset))
             last_label = jong
             last_jamo_onset = jong_onset
@@ -850,9 +1097,10 @@ class HangulCompiler:
 
             #5/150.#5/d,4/i/100.#4/150
 
-        Empty onset gaps are emitted as ``0/N``. Equal-onset events are joined
-        into one step. A staggered overlap cannot be expressed by the current
-        firmware without rewriting a ramp, so it raises a clear error instead.
+        Empty end-to-start ISIs are emitted as ``0/N``. Equal-onset events are
+        joined into one step. Generated ISI timelines are sequential, so an
+        overlap here indicates a malformed raw/custom timeline rather than a
+        normal timing-rule conflict.
         """
         clean = [e for e in events if int(e.duration_ms) > 0 and str(e.command).strip()]
         if not clean:
@@ -868,8 +1116,8 @@ class HangulCompiler:
             if onset < cursor:
                 overlap = cursor - onset
                 raise CompileError(
-                    f"현재 Arduino 문법으로는 {overlap} ms 겹침 SOA를 /i·/d 원형 그대로 "
-                    "전송할 수 없습니다. 해당 SOA를 앞 자극 duration 이상으로 설정하세요."
+                    f"타임라인 내부에 {overlap} ms 중첩이 있습니다. "
+                    "일반 ISI 규칙에서는 발생하지 않으므로 raw/custom command를 확인하세요."
                 )
             if onset > cursor:
                 parts.append(f"0/{onset - cursor}")
@@ -966,14 +1214,10 @@ def atomic(arm: str, pos: int, temporal: str, note: str = "") -> Dict[str, Any]:
 
 
 def composite(refs: Sequence[str], gap: int = 150, note: str = "") -> Dict[str, Any]:
-    """Create a composite using the previous API's ISI argument.
-
-    The default setup is migrated to SOA immediately after all jamo mappings are
-    created, so this helper stays compatible with older setup construction code.
-    """
+    """Create a composite with direct end-to-start ISI values."""
     steps = []
     for i, ref in enumerate(refs):
-        steps.append({"ref": ref, "legacy_isi_ms": 0 if i == 0 else int(gap)})
+        steps.append({"ref": ref, "isi_before_ms": 0 if i == 0 else int(gap)})
     return asdict(JamoSpec(mode="composite", steps=steps, note=note))
 
 
@@ -1028,26 +1272,24 @@ def make_default_setup() -> DesignSetup:
         "ㅟ": composite(["ㅜ", "ㅣ"], 150),
     })
 
-    # Start from the old physical timing, but express it as onset-to-onset SOA.
-    # A short 200 ms stimulus followed by the old 150 ms ISI therefore becomes
-    # a 350 ms SOA. Long/repeat/motion classes receive their own values.
+    # Every internal value is now direct end-to-start ISI.
     s.timing_defaults_ms = _default_timing_defaults_ms()
-    s.timing_matrix_ms = {}
-    for raw_spec in s.jamo.values():
-        if not isinstance(raw_spec, dict) or raw_spec.get("mode") != "composite":
-            continue
-        previous_ref = ""
-        for index, step in enumerate(raw_spec.get("steps") or []):
-            ref = str(step.get("ref", ""))
-            if index == 0:
-                step["soa_before_ms"] = 0
-                step.pop("legacy_isi_ms", None)
-            else:
-                legacy_isi = int(step.pop("legacy_isi_ms", LEGACY_ISI_DEFAULTS_MS["composite"]))
-                prev_cls = s.timing_class_for(previous_ref)
-                step["soa_before_ms"] = NOMINAL_TIMING_CLASS_DURATION_MS.get(prev_cls, 300) + legacy_isi
-            step.pop("gap_before_ms", None)
-            previous_ref = ref
+    s.timing_matrix_ms = {
+        context: {
+            prev_cls: {
+                next_cls: int(s.timing_defaults_ms[context])
+                for next_cls in TIMING_CLASS_LABELS
+            }
+            for prev_cls in TIMING_CLASS_LABELS
+        }
+        for context in TIMING_CONTEXT_LABELS
+    }
+    s.cv_short_isi_ms = int(s.timing_defaults_ms["cv"])
+    s.cv_long_isi_ms = int(s.timing_defaults_ms["cv"])
+    s.cvc_cv_short_isi_ms = int(s.timing_defaults_ms["cvc_cv"])
+    s.cvc_cv_long_isi_ms = int(s.timing_defaults_ms["cvc_cv"])
+    s.sync_duration_cv_rows_from_fields()
+    s.timing_semantics_version = 6
     return s
 
 
@@ -1196,6 +1438,54 @@ def load_syllables(path: Path, limit: int = 200) -> List[str]:
     return list(dict.fromkeys(labels))
 
 
+def load_general_quiz_syllables(path: Path) -> List[str]:
+    """Load the strict source inventory for the typed CV/CVC quiz.
+
+    The preferred syllable column is detected from common English/Korean header
+    names. If the selected cells contain words rather than one-character entries,
+    every modern Hangul syllable is split out in source order. Duplicate syllables
+    are removed while keeping the first occurrence.
+    """
+    if load_workbook is None:
+        raise RuntimeError("openpyxl이 필요합니다.")
+    path = Path(path)
+    if not path.exists():
+        raise RuntimeError(
+            f"일반 퀴즈용 syllable_top200.xlsx가 없습니다: {path}\n"
+            "프로그램 폴더에 파일을 넣거나 일반 퀴즈 화면에서 XLSX를 선택하세요."
+        )
+
+    wb = load_workbook(path, read_only=True, data_only=True)
+    ws = wb.active
+    rows = ws.iter_rows(values_only=True)
+    first = next(rows, None)
+    if first is None:
+        return []
+
+    preferred_headers = {
+        "syl", "syll", "syllable", "letter", "char",
+        "음절", "글자", "문자", "단어", "word",
+    }
+    normalized = [str(value).strip().lower() if value is not None else "" for value in first]
+    source_column = next((i for i, value in enumerate(normalized) if value in preferred_headers), None)
+    has_header = source_column is not None
+    if source_column is None:
+        source_column = 0
+
+    source_rows = rows if has_header else iter([first] + list(rows))
+    syllables: List[str] = []
+    seen: set[str] = set()
+    for row in source_rows:
+        if not row or len(row) <= source_column or row[source_column] is None:
+            continue
+        text = str(row[source_column]).strip()
+        for ch in text:
+            if 0xAC00 <= ord(ch) <= 0xD7A3 and ch not in seen:
+                seen.add(ch)
+                syllables.append(ch)
+    return syllables
+
+
 # ----------------------------- editor widgets -----------------------------
 
 class PositionGrid(QWidget):
@@ -1230,32 +1520,51 @@ class PositionGrid(QWidget):
 
 
 class TimingRulesDialog(QDialog):
-    """Advanced duration thresholds, SOA matrix, and pair overrides."""
+    """Advanced duration thresholds, ISI matrix, and pair overrides."""
 
     def __init__(self, app: "MainWindow"):
         super().__init__(app)
         self.app = app
-        self.setWindowTitle("세부 SOA 규칙")
-        self.resize(1260, 860)
+        self.setWindowTitle("세부 ISI 규칙")
+        self.resize(1280, 880)
         self.setMinimumSize(1000, 720)
         self.matrix_data = _deep_copy_timing_matrix(app.setup.timing_matrix_ms)
         self.pair_data = dict(app.setup.timing_pair_overrides_ms)
+        self.jamo_data = copy.deepcopy(app.setup.jamo)
         self.current_context = ""
         self._loading = False
 
-        root = QVBoxLayout(self)
-        root.setContentsMargins(24, 22, 24, 22)
-        root.setSpacing(14)
+        # Keep the complete advanced editor in one vertical scroll area and
+        # leave save/cancel actions fixed at the bottom for high-DPI displays.
+        outer_root = QVBoxLayout(self)
+        outer_root.setContentsMargins(14, 12, 14, 12)
+        outer_root.setSpacing(10)
 
-        title = QLabel("자극 종류별 onset-to-onset 타이밍")
+        editor_scroll = QScrollArea()
+        editor_scroll.setObjectName("TimingRulesScroll")
+        editor_scroll.setWidgetResizable(True)
+        editor_scroll.setFrameShape(QFrame.NoFrame)
+        editor_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        editor_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        editor_body = QWidget()
+        editor_body.setObjectName("TimingRulesScrollBody")
+        root = QVBoxLayout(editor_body)
+        root.setContentsMargins(10, 10, 10, 12)
+        root.setSpacing(14)
+        editor_scroll.setWidget(editor_body)
+        outer_root.addWidget(editor_scroll, 1)
+
+        title = QLabel("자극 종류별 end-to-start ISI")
         title.setObjectName("SectionTitle")
         root.addWidget(title)
         hint = QLabel(
-            "모든 값은 앞 자극의 시작 시점부터 뒤 자극의 시작 시점까지의 SOA입니다. "
-            "앞 자극이 끝나기 전에 다음 자극을 시작하려면 앞 자극 duration보다 작은 값을 넣으세요. "
+            "모든 값은 앞 자극이 완전히 끝난 뒤 다음 자극을 시작하기까지 기다리는 ISI입니다. "
+            "예를 들어 앞 자극이 1000 ms이고 ISI가 200 ms이면 다음 자극은 1200 ms에 시작합니다. "
+            "따라서 자극 길이가 아무리 길어도 겹침 예외가 생기지 않습니다. "
             "자모 pair override가 있으면 아래 class 행렬보다 우선합니다. "
-            "일반 자음→모음은 자음 duration 규칙을 사용하고, 모션은 실제 길이에 따라 "
-            "‘짧은 모션/긴 모션’ 행과 열을 자동 선택합니다."
+            "CV와 CVC 첫 자음 구간에서는 실제 자음 duration으로 ‘짧음/김’ 행을 선택하며, "
+            "해당 행의 셀 하나를 바꾸면 행 전체가 함께 바뀌고 오른쪽 기본 설정과도 동기화됩니다."
         )
         hint.setObjectName("Hint")
         hint.setWordWrap(True)
@@ -1274,7 +1583,7 @@ class TimingRulesDialog(QDialog):
         self.consonant_duration_split.setRange(1, 5000)
         self.consonant_duration_split.setSuffix(" ms")
         self.consonant_duration_split.setValue(int(app.setup.cv_duration_split_ms))
-        self.consonant_duration_split.setToolTip("이 값 이하이면 짧은 자음 SOA, 초과이면 긴 자음 SOA를 사용합니다.")
+        self.consonant_duration_split.setToolTip("이 값 이하이면 짧은 자음 ISI 행, 초과이면 긴 자음 ISI 행을 사용합니다.")
         self.motion_duration_split = QSpinBox()
         self.motion_duration_split.setRange(1, 5000)
         self.motion_duration_split.setSuffix(" ms")
@@ -1298,7 +1607,7 @@ class TimingRulesDialog(QDialog):
         for key, label in TIMING_CONTEXT_LABELS.items():
             self.context_combo.addItem(label, key)
         context_row.addWidget(self.context_combo, 1)
-        fill_btn = button("현재 기본 SOA로 전체 채우기", "ghost")
+        fill_btn = button("현재 기본 ISI로 전체 채우기", "ghost")
         fill_btn.clicked.connect(self.fill_matrix_with_default)
         context_row.addWidget(fill_btn)
         root.addLayout(context_row)
@@ -1306,27 +1615,59 @@ class TimingRulesDialog(QDialog):
         class_note = QLabel("행 = 앞 자극 종류 · 열 = 뒤 자극 종류")
         class_note.setObjectName("Hint")
         root.addWidget(class_note)
+        self.matrix_rule_note = QLabel("")
+        self.matrix_rule_note.setObjectName("MiniCard")
+        self.matrix_rule_note.setWordWrap(True)
+        root.addWidget(self.matrix_rule_note)
         classes = list(TIMING_CLASS_LABELS)
         self.matrix_table = QTableWidget(len(classes), len(classes))
         self.matrix_table.setObjectName("TimingMatrixTable")
         self.matrix_table.setHorizontalHeaderLabels([TIMING_CLASS_LABELS[x] for x in classes])
         self.matrix_table.setVerticalHeaderLabels([TIMING_CLASS_LABELS[x] for x in classes])
-        self.matrix_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.matrix_table.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.matrix_table.setMinimumHeight(340)
+
+        # Do not stretch seven columns into cells that are too narrow for
+        # ``450 ms`` under Windows 125/150% DPI scaling.  Fixed logical widths
+        # preserve a readable editor, while the table supplies a horizontal
+        # scroll bar on smaller displays.
+        h_header = self.matrix_table.horizontalHeader()
+        h_header.setSectionResizeMode(QHeaderView.Fixed)
+        h_header.setMinimumSectionSize(132)
+        h_header.setDefaultSectionSize(144)
+        h_header.setStretchLastSection(False)
+        v_header = self.matrix_table.verticalHeader()
+        v_header.setSectionResizeMode(QHeaderView.Fixed)
+        v_header.setMinimumSectionSize(46)
+        v_header.setDefaultSectionSize(46)
+        v_header.setMinimumWidth(110)
+        self.matrix_table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.matrix_table.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.matrix_table.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.matrix_table.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.matrix_table.setMinimumHeight(365)
+        self.matrix_table.setMaximumHeight(405)
+
         self.matrix_spins: Dict[Tuple[str, str], QSpinBox] = {}
         for r, prev_cls in enumerate(classes):
+            self.matrix_table.setRowHeight(r, 46)
             for c, next_cls in enumerate(classes):
                 sp = QSpinBox()
+                sp.setObjectName("TimingMatrixSpin")
                 sp.setRange(0, 5000)
                 sp.setSuffix(" ms")
                 sp.setAlignment(Qt.AlignCenter)
+                sp.setMinimumWidth(116)
+                sp.setMinimumHeight(38)
+                sp.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 sp.setToolTip(
-                    f"{TIMING_CLASS_LABELS[prev_cls]} 시작 → {TIMING_CLASS_LABELS[next_cls]} 시작"
+                    f"{TIMING_CLASS_LABELS[prev_cls]} 종료 → {TIMING_CLASS_LABELS[next_cls]} 시작 ISI"
                 )
                 self.matrix_table.setCellWidget(r, c, sp)
                 self.matrix_spins[(prev_cls, next_cls)] = sp
-        root.addWidget(self.matrix_table, 1)
+                sp.valueChanged.connect(
+                    lambda value, p=prev_cls, n=next_cls:
+                    self._matrix_value_changed(p, n, value)
+                )
+        root.addWidget(self.matrix_table)
 
         pair_title_row = QHBoxLayout()
         pair_title = QLabel("특정 자모 pair override")
@@ -1335,7 +1676,7 @@ class TimingRulesDialog(QDialog):
         pair_title_row.addStretch(1)
         self.pair_from = QComboBox(); self.pair_from.addItems(CONSONANTS + VOWELS + list(COMPOUND_FINALS))
         self.pair_to = QComboBox(); self.pair_to.addItems(CONSONANTS + VOWELS + list(COMPOUND_FINALS))
-        self.pair_soa = QSpinBox(); self.pair_soa.setRange(0, 5000); self.pair_soa.setSuffix(" ms")
+        self.pair_isi = QSpinBox(); self.pair_isi.setRange(0, 5000); self.pair_isi.setSuffix(" ms")
         add_pair = button("추가", "secondary")
         del_pair = button("선택 삭제", "ghost")
         add_pair.clicked.connect(self.add_pair_override)
@@ -1343,33 +1684,54 @@ class TimingRulesDialog(QDialog):
         pair_title_row.addWidget(self.pair_from)
         pair_title_row.addWidget(QLabel("→"))
         pair_title_row.addWidget(self.pair_to)
-        pair_title_row.addWidget(self.pair_soa)
+        pair_title_row.addWidget(self.pair_isi)
         pair_title_row.addWidget(add_pair)
         pair_title_row.addWidget(del_pair)
         root.addLayout(pair_title_row)
 
         self.pair_table = QTableWidget(0, 3)
-        self.pair_table.setHorizontalHeaderLabels(["앞 자모", "뒤 자모", "SOA"])
+        self.pair_table.setHorizontalHeaderLabels(["앞 자모", "뒤 자모", "ISI"])
         self.pair_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.pair_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.pair_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         self.pair_table.verticalHeader().setVisible(False)
         self.pair_table.setSelectionBehavior(QTableWidget.SelectRows)
-        self.pair_table.setMaximumHeight(180)
+        self.pair_table.setMinimumHeight(96)
+        self.pair_table.setMaximumHeight(150)
         root.addWidget(self.pair_table)
+
 
         actions = QHBoxLayout()
         actions.addStretch(1)
         cancel_btn = button("취소", "ghost")
-        save_btn = button("SOA 규칙 저장", "primary")
+        save_btn = button("ISI 규칙 저장", "primary")
         cancel_btn.clicked.connect(self.reject)
         save_btn.clicked.connect(self.accept_rules)
         actions.addWidget(cancel_btn)
         actions.addWidget(save_btn)
-        root.addLayout(actions)
+        outer_root.addLayout(actions)
+
+        # Preserve natural content height on short/high-DPI displays.
+        editor_body.setMinimumHeight(max(980, editor_body.sizeHint().height()))
 
         self.context_combo.currentIndexChanged.connect(self._switch_context)
         self._switch_context(0)
+
+    def _matrix_value_changed(self, prev_cls: str, _next_cls: str, value: int) -> None:
+        """Keep duration-based CV rows uniform and visibly synchronized."""
+        if self._loading:
+            return
+        context = self.current_context
+        if context in ("cv", "cvc_cv") and prev_cls in ("short", "long"):
+            self._loading = True
+            try:
+                for next_cls in TIMING_CLASS_LABELS:
+                    spin = self.matrix_spins[(prev_cls, next_cls)]
+                    spin.blockSignals(True)
+                    spin.setValue(int(value))
+                    spin.blockSignals(False)
+            finally:
+                self._loading = False
 
     def _save_current_context(self) -> None:
         if self._loading or not self.current_context:
@@ -1388,14 +1750,14 @@ class TimingRulesDialog(QDialog):
         for r in range(self.pair_table.rowCount()):
             from_lab = self.pair_table.item(r, 0).text()
             to_lab = self.pair_table.item(r, 1).text()
-            soa_item = self.pair_table.item(r, 2)
-            raw_soa = soa_item.data(Qt.UserRole)
-            if raw_soa is None:
-                match = re.search(r"\d+", soa_item.text())
-                raw_soa = int(match.group(0)) if match else 0
-            soa = int(raw_soa)
+            isi_item = self.pair_table.item(r, 2)
+            raw_isi = isi_item.data(Qt.UserRole)
+            if raw_isi is None:
+                match = re.search(r"\d+", isi_item.text())
+                raw_isi = int(match.group(0)) if match else 0
+            isi = int(raw_isi)
             key = DesignSetup.pair_override_key(context, from_lab, to_lab)
-            self.pair_data[key] = soa
+            self.pair_data[key] = isi
 
     def _switch_context(self, _index: int) -> None:
         if self.current_context:
@@ -1410,6 +1772,19 @@ class TimingRulesDialog(QDialog):
                 value = matrix.get(prev_cls, {}).get(next_cls, default)
                 self.matrix_spins[(prev_cls, next_cls)].setValue(int(value))
         self._load_pairs(context)
+        if context in ("cv", "cvc_cv"):
+            self.matrix_rule_note.setText(
+                "이 구간의 ‘짧음’과 ‘김’ 행은 앞 자음의 실제 duration으로 선택됩니다. "
+                "셀 하나를 수정하면 해당 행 전체가 같은 값으로 바뀌고, 저장 시 기본 화면의 "
+                "짧은/긴 ISI 값에도 그대로 반영됩니다."
+            )
+            self.matrix_rule_note.show()
+        else:
+            self.matrix_rule_note.setText(
+                "이 구간은 각 행·열 셀을 독립적으로 설정할 수 있습니다. "
+                "특정 자모 pair override가 있으면 행렬보다 먼저 적용됩니다."
+            )
+            self.matrix_rule_note.show()
         self._loading = False
 
     def _load_pairs(self, context: str) -> None:
@@ -1422,48 +1797,89 @@ class TimingRulesDialog(QDialog):
             parts = key.split("|", 2)
             if len(parts) == 3:
                 items.append((parts[1], parts[2], int(value)))
-        for from_lab, to_lab, soa in sorted(items):
-            self._append_pair_row(from_lab, to_lab, soa)
+        for from_lab, to_lab, isi in sorted(items):
+            self._append_pair_row(from_lab, to_lab, isi)
 
-    def _append_pair_row(self, from_lab: str, to_lab: str, soa: int) -> None:
+    def _append_pair_row(self, from_lab: str, to_lab: str, isi: int) -> None:
         r = self.pair_table.rowCount()
         self.pair_table.insertRow(r)
         self.pair_table.setItem(r, 0, QTableWidgetItem(from_lab))
         self.pair_table.setItem(r, 1, QTableWidgetItem(to_lab))
-        item = QTableWidgetItem(f"{int(soa)} ms")
-        item.setData(Qt.UserRole, int(soa))
+        item = QTableWidgetItem(f"{int(isi)} ms")
+        item.setData(Qt.UserRole, int(isi))
         self.pair_table.setItem(r, 2, item)
 
     def add_pair_override(self) -> None:
-        from_lab, to_lab, soa = self.pair_from.currentText(), self.pair_to.currentText(), self.pair_soa.value()
+        from_lab, to_lab, isi = self.pair_from.currentText(), self.pair_to.currentText(), self.pair_isi.value()
         for r in range(self.pair_table.rowCount()):
             if self.pair_table.item(r, 0).text() == from_lab and self.pair_table.item(r, 1).text() == to_lab:
-                self.pair_table.item(r, 2).setText(f"{soa} ms")
-                self.pair_table.item(r, 2).setData(Qt.UserRole, int(soa))
+                self.pair_table.item(r, 2).setText(f"{isi} ms")
+                self.pair_table.item(r, 2).setData(Qt.UserRole, int(isi))
                 self.pair_table.selectRow(r)
                 return
-        self._append_pair_row(from_lab, to_lab, soa)
+        self._append_pair_row(from_lab, to_lab, isi)
         self.pair_table.selectRow(self.pair_table.rowCount() - 1)
 
     def delete_pair_override(self) -> None:
         r = self.pair_table.currentRow()
         if r >= 0:
             self.pair_table.removeRow(r)
-
+    
     def fill_matrix_with_default(self) -> None:
         context = str(self.context_combo.currentData())
         default = int(self.app.setup.timing_defaults_ms.get(context, 0))
-        for sp in self.matrix_spins.values():
-            sp.setValue(default)
+        self._loading = True
+        try:
+            for sp in self.matrix_spins.values():
+                sp.setValue(default)
+
+            # The two duration rows are linked to the basic controls, so a
+            # reset must restore those values rather than replacing both with
+            # the short/default value.
+            if context == "cv":
+                row_values = {
+                    "short": int(self.app.cv_short_isi.value()),
+                    "long": int(self.app.cv_long_isi.value()),
+                }
+            elif context == "cvc_cv":
+                row_values = {
+                    "short": int(self.app.cvc_cv_short_isi.value()),
+                    "long": int(self.app.cvc_cv_long_isi.value()),
+                }
+            else:
+                row_values = {}
+
+            for prev_cls, value in row_values.items():
+                for next_cls in TIMING_CLASS_LABELS:
+                    self.matrix_spins[(prev_cls, next_cls)].setValue(value)
+        finally:
+            self._loading = False
 
     def accept_rules(self) -> None:
         self._save_current_context()
-        self.app.setup.timing_matrix_ms = _expand_motion_duration_matrix(
-            self.matrix_data, self.app.setup.timing_defaults_ms
+        setup = self.app.setup
+        setup.timing_matrix_ms = _expand_motion_duration_matrix(
+            self.matrix_data, setup.timing_defaults_ms
         )
-        self.app.setup.timing_pair_overrides_ms = dict(self.pair_data)
-        self.app.setup.cv_duration_split_ms = int(self.consonant_duration_split.value())
-        self.app.setup.motion_duration_split_ms = int(self.motion_duration_split.value())
+        setup.timing_pair_overrides_ms = dict(self.pair_data)
+        setup.jamo = copy.deepcopy(self.jamo_data)
+        setup.cv_duration_split_ms = int(self.consonant_duration_split.value())
+        setup.motion_duration_split_ms = int(self.motion_duration_split.value())
+        setup.timing_semantics_version = 6
+
+        # The advanced matrix is authoritative. Mirror its synchronized rows
+        # back to the four simple controls without triggering a second rewrite.
+        setup.sync_duration_cv_fields_from_matrix()
+        for widget, value in (
+            (self.app.cv_short_isi, setup.cv_short_isi_ms),
+            (self.app.cv_long_isi, setup.cv_long_isi_ms),
+            (self.app.cvc_cv_short_isi, setup.cvc_cv_short_isi_ms),
+            (self.app.cvc_cv_long_isi, setup.cvc_cv_long_isi_ms),
+        ):
+            widget.blockSignals(True)
+            widget.setValue(int(value))
+            widget.blockSignals(False)
+
         self.app.update_duration_rule_summary()
         self.app.mark_dirty()
         self.app.update_duration_estimate()
@@ -1486,14 +1902,14 @@ class MappingEditor(QWidget):
         self.title.setObjectName("SectionTitle")
         title_row.addWidget(self.title)
         title_row.addStretch(1)
-        title_row.addWidget(QLabel("고급 SOA 유형"))
+        title_row.addWidget(QLabel("고급 ISI 유형"))
         self.timing_class_combo = QComboBox()
         self.timing_class_combo.addItem("자동 판별", "auto")
         for key, label in TIMING_CLASS_EDITOR_LABELS.items():
             self.timing_class_combo.addItem(label, key)
         self.timing_class_combo.setToolTip(
             "대부분 자동 판별로 둡니다. 모션은 실제 duration과 고급 설정의 모션 기준으로 "
-            "짧은 모션/긴 모션 SOA 행렬을 자동 선택합니다."
+            "짧은 모션/긴 모션 ISI 행렬을 자동 선택합니다."
         )
         title_row.addWidget(self.timing_class_combo)
         self.mode_combo = QComboBox()
@@ -1547,15 +1963,15 @@ class MappingEditor(QWidget):
         cg.setContentsMargins(4, 4, 4, 4)
         hint = QLabel(
             "예: ㅢ = ㅡ + ㅣ. 각 step은 저장된 자모 디자인을 참조합니다. "
-            "오른쪽의 Composite 기본 SOA는 새 Step을 추가할 때 들어가는 onset 간격이며, "
-            "이미 만든 행의 개별 SOA는 자동으로 덮어쓰지 않습니다."
+            "오른쪽의 Composite 기본 ISI는 앞 Step이 완전히 끝난 뒤 기다리는 시간이며, "
+            "이미 만든 행의 개별 ISI는 자동으로 덮어쓰지 않습니다."
         )
         hint.setWordWrap(True)
         hint.setObjectName("Hint")
         cg.addWidget(hint)
         self.steps_table = QTableWidget(0, 2)
         self.steps_table.setObjectName("StepsTable")
-        self.steps_table.setHorizontalHeaderLabels(["구성 자모", "이전 onset → 현재 onset (ms)"])
+        self.steps_table.setHorizontalHeaderLabels(["구성 자모", "앞 Step 종료 후 ISI (ms)"])
         table_header = self.steps_table.horizontalHeader()
         table_header.setSectionResizeMode(0, QHeaderView.Stretch)
         table_header.setSectionResizeMode(1, QHeaderView.Fixed)
@@ -1576,11 +1992,11 @@ class MappingEditor(QWidget):
         self.step_gap_spin.setRange(0, 2000)
         self.step_gap_spin.setValue(int(self.app.setup.timing_defaults_ms.get("composite", 350)))
         self.step_gap_spin.setSuffix(" ms")
-        self.step_gap_spin.setToolTip("새 Step을 이전 Step 시작 후 몇 ms에 시작할지 설정합니다. 오른쪽 Composite 기본 SOA와 동기화됩니다.")
+        self.step_gap_spin.setToolTip("앞 Step이 완전히 끝난 뒤 새 Step 시작까지 기다릴 ISI입니다. 오른쪽 Composite 기본 ISI와 동기화됩니다.")
         add_btn = button("＋ Step", "secondary")
         del_btn = button("삭제", "ghost")
         apply_gap_btn = button("기존 Step에 적용", "ghost")
-        apply_gap_btn.setToolTip("현재 SOA 값을 이미 만든 2번째 이후 Step에 한 번에 적용합니다.")
+        apply_gap_btn.setToolTip("현재 ISI 값을 이미 만든 2번째 이후 Step에 한 번에 적용합니다.")
         up_btn = QPushButton()
         up_btn.setObjectName("RoundIconButton")
         up_btn.setIcon(QIcon(str(ARROW_UP_SVG)))
@@ -1602,7 +2018,7 @@ class MappingEditor(QWidget):
         down_btn.clicked.connect(lambda: self.move_step(1))
         cr.addWidget(QLabel("추가할 자모"))
         cr.addWidget(self.ref_combo)
-        cr.addWidget(QLabel("새 Step SOA"))
+        cr.addWidget(QLabel("새 Step ISI"))
         cr.addWidget(self.step_gap_spin)
         cr.addWidget(add_btn)
         cr.addWidget(del_btn)
@@ -1703,7 +2119,7 @@ class MappingEditor(QWidget):
         self.on2_spin.setValue(int(spec.on2_ms))
         self.steps_table.setRowCount(0)
         for step in spec.steps:
-            self._append_step_row(str(step.get("ref", "")), int(step.get("soa_before_ms", step.get("gap_before_ms", 0))))
+            self._append_step_row(str(step.get("ref", "")), int(step.get("isi_before_ms", 0)))
         self.raw_edit.setPlainText(spec.raw_command)
         self.note_edit.setText(spec.note)
         self.update_mode_visibility()
@@ -1723,7 +2139,7 @@ class MappingEditor(QWidget):
         self.step_gap_spin.setValue(value)
         self.step_gap_spin.blockSignals(False)
 
-    def _append_step_row(self, ref: str, soa_before: int) -> None:
+    def _append_step_row(self, ref: str, isi_before: int) -> None:
         r = self.steps_table.rowCount()
         self.steps_table.insertRow(r)
         self.steps_table.setRowHeight(r, 60)
@@ -1736,7 +2152,7 @@ class MappingEditor(QWidget):
         spin.setObjectName("TableSpinBox")
         spin.setRange(0, 2000)
         spin.setSuffix(" ms")
-        spin.setValue(int(soa_before))
+        spin.setValue(int(isi_before))
         spin.setMinimumHeight(44)
         spin.setMinimumWidth(184)
         combo.currentTextChanged.connect(self._on_editor_value_changed)
@@ -1778,12 +2194,12 @@ class MappingEditor(QWidget):
     def _step_at(self, r: int) -> Dict[str, Any]:
         return {
             "ref": self.steps_table.cellWidget(r, 0).currentText(),
-            "soa_before_ms": self.steps_table.cellWidget(r, 1).value(),
+            "isi_before_ms": self.steps_table.cellWidget(r, 1).value(),
         }
 
     def _set_step_at(self, r: int, step: Dict[str, Any]) -> None:
         self.steps_table.cellWidget(r, 0).setCurrentText(str(step["ref"]))
-        self.steps_table.cellWidget(r, 1).setValue(int(step.get("soa_before_ms", step.get("gap_before_ms", 0))))
+        self.steps_table.cellWidget(r, 1).setValue(int(step.get("isi_before_ms", 0)))
 
     def collect_spec(self) -> JamoSpec:
         mode = self.mode_combo.currentData()
@@ -1818,7 +2234,7 @@ class MappingEditor(QWidget):
             dur = HangulCompiler.estimate_duration_ms(cmd)
             timing_class = self.app.setup.timing_class_for(self.current_label)
             class_label = TIMING_CLASS_EDITOR_LABELS.get(timing_class, timing_class)
-            self.preview.setPlainText(f"{cmd}\n예상 duration: {dur} ms · 고급 SOA 유형: {class_label}")
+            self.preview.setPlainText(f"{cmd}\n예상 duration: {dur} ms · 고급 ISI 유형: {class_label}")
         except Exception as exc:
             self.preview.setPlainText(f"컴파일 오류: {exc}")
             if show_error:
@@ -1838,6 +2254,66 @@ class MappingEditor(QWidget):
             QMessageBox.critical(self, "자극 오류", str(exc))
 
 
+
+def load_startup_default_setup() -> Tuple[DesignSetup, Path, str]:
+    """Load ``hangul_tactile_setups/default.json`` at application startup.
+
+    The lookup is case-insensitive so ``Default.json`` also works. If no user
+    default exists yet, create one from the bundled default setup (or from the
+    built-in setup as a final fallback). A malformed user file never prevents
+    the program from opening; it falls back to the built-in setup and reports
+    the reason after the UI is ready.
+    """
+    SETUP_DIR.mkdir(parents=True, exist_ok=True)
+    canonical = SETUP_DIR / "default.json"
+    candidates = sorted(
+        (p for p in SETUP_DIR.glob("*.json") if p.stem.casefold() == "default"),
+        key=lambda p: (p.name.casefold() != "default.json", p.name.casefold()),
+    )
+    selected = candidates[0] if candidates else canonical
+
+    if selected.exists():
+        try:
+            with selected.open("r", encoding="utf-8") as handle:
+                raw_setup = json.load(handle)
+            previous_version = int(raw_setup.get("timing_semantics_version", 1) or 1)
+            setup = DesignSetup.from_dict(raw_setup)
+            if previous_version < 6:
+                message = (
+                    f"{selected.name}의 기존 SOA 타이밍을 end-to-start ISI로 자동 변환했습니다. "
+                    "확인 후 저장하면 v17 형식으로 저장됩니다."
+                )
+            else:
+                message = f"시작 기본 셋업 불러옴 · {selected.name}"
+            return setup, selected, message
+        except Exception as exc:
+            fallback = make_default_setup()
+            return (
+                fallback,
+                canonical,
+                f"{selected.name}을 불러오지 못해 내장 기본값을 사용합니다: {exc}",
+            )
+
+    # Seed the user-visible default.json once. Prefer the package's JSON copy
+    # because it is easy to inspect and edit outside the application.
+    setup = make_default_setup()
+    bundled_default = RESOURCE_DIR / "hangul_tactile_default_setup.json"
+    if bundled_default.exists():
+        try:
+            with bundled_default.open("r", encoding="utf-8") as handle:
+                setup = DesignSetup.from_dict(json.load(handle))
+        except Exception:
+            setup = make_default_setup()
+
+    try:
+        with canonical.open("w", encoding="utf-8") as handle:
+            json.dump(setup.to_dict(), handle, ensure_ascii=False, indent=2)
+        message = "hangul_tactile_setups/default.json 생성 및 자동 불러오기 완료"
+    except Exception as exc:
+        message = f"default.json 생성 실패 · 내장 기본값 사용: {exc}"
+    return setup, canonical, message
+
+
 # ----------------------------- main window -----------------------------
 
 class MainWindow(QMainWindow):
@@ -1846,8 +2322,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Hangul Tactile Designer")
         self.resize(1680, 980)
         self.setMinimumSize(1280, 760)
-        self.setup = make_default_setup()
-        self.setup_path: Optional[Path] = None
+        self.setup, startup_setup_path, self._startup_setup_message = load_startup_default_setup()
+        self.setup_path: Optional[Path] = startup_setup_path
         self.dirty = False
         self.serial_ctl = SerialController()
         self.voice_backend = None
@@ -1865,6 +2341,29 @@ class MainWindow(QMainWindow):
         self.quiz_started_perf = 0.0
         self.quiz_rows: List[Dict[str, Any]] = []
         self.quiz_csv_path: Optional[Path] = None
+
+        # Text-answer CV/CVC tactile quiz state.
+        self.general_quiz_plan: List[Dict[str, Any]] = []
+        self.general_quiz_index = -1
+        self.general_quiz_target = ""
+        self.general_quiz_command = ""
+        self.general_quiz_started_perf = 0.0
+        self.general_quiz_replays = 0
+        self.general_quiz_answered = False
+        self.general_quiz_rows: List[Dict[str, Any]] = []
+        self.general_quiz_csv_path: Optional[Path] = None
+
+        # Multiple-choice tactile learning state for selected jamo groups.
+        self.learning_plan: List[Dict[str, Any]] = []
+        self.learning_index = -1
+        self.learning_target = ""
+        self.learning_command = ""
+        self.learning_started_perf = 0.0
+        self.learning_replays = 0
+        self.learning_answered = False
+        self.learning_rows: List[Dict[str, Any]] = []
+        self.learning_csv_path: Optional[Path] = None
+        self.learning_choice_buttons: List[QPushButton] = []
         self.build_ui()
         self.apply_style()
         self.refresh_ports()
@@ -1872,6 +2371,13 @@ class MainWindow(QMainWindow):
         self.mapping_editor.load_label("ㄱ")
         self.sync_setup_controls_from_model()
         self.update_setup_title()
+        if self._startup_setup_message:
+            is_error = "실패" in self._startup_setup_message or "못해" in self._startup_setup_message
+            QTimer.singleShot(
+                250,
+                lambda message=self._startup_setup_message, error=is_error:
+                self.toast(message, error=error),
+            )
 
     # --------- UI shell ---------
     def build_ui(self) -> None:
@@ -1899,8 +2405,10 @@ class MainWindow(QMainWindow):
         navs = [
             ("디자인", 0),
             ("심플 테스트", 1),
-            ("보이스 퀴즈", 2),
-            ("하드웨어 · 설정", 3),
+            ("선택 학습", 2),
+            ("일반 퀴즈", 3),
+            ("보이스 퀴즈", 4),
+            ("하드웨어 · 설정", 5),
         ]
         for text, idx in navs:
             b = QPushButton(text)
@@ -1944,6 +2452,8 @@ class MainWindow(QMainWindow):
         self.stack = QStackedWidget()
         self.stack.addWidget(self.build_design_page())
         self.stack.addWidget(self.build_simple_page())
+        self.stack.addWidget(self.build_learning_page())
+        self.stack.addWidget(self.build_general_quiz_page())
         self.stack.addWidget(self.build_quiz_page())
         self.stack.addWidget(self.build_hardware_page())
         rl.addWidget(self.stack, 1)
@@ -1995,7 +2505,7 @@ class MainWindow(QMainWindow):
         # squeeze the estimator card when the available height was short,
         # causing its labels and spin box to overlap.  A dedicated scroll area
         # now preserves each control's natural height instead.
-        timing = card(); timing.setMinimumWidth(360); timing.setMaximumWidth(410)
+        timing = card(); timing.setMinimumWidth(360); timing.setMaximumWidth(430)
         timing_outer = QVBoxLayout(timing)
         timing_outer.setContentsMargins(0, 0, 0, 0)
         timing_scroll = QScrollArea()
@@ -2006,61 +2516,61 @@ class MainWindow(QMainWindow):
         timing_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         timing_body = QWidget()
         timing_body.setObjectName("TimingScrollBody")
-        timing_body.setMinimumHeight(1240)
-        gl = QVBoxLayout(timing_body); gl.setContentsMargins(22, 20, 22, 20); gl.setSpacing(12)
+        timing_body.setMinimumHeight(1520)
+        gl = QVBoxLayout(timing_body); gl.setContentsMargins(18, 20, 18, 20); gl.setSpacing(12)
         timing_scroll.setWidget(timing_body)
         timing_outer.addWidget(timing_scroll)
         gt = QLabel("음절 타이밍"); gt.setObjectName("SectionTitle"); gl.addWidget(gt)
         gh = QLabel(
-            "자모 내부는 onset→onset SOA입니다. 음절·단어 경계는 앞 음절의 모든 자극이 끝난 뒤부터 재는 ISI입니다. "
-            "현재 Arduino를 그대로 쓰므로 distinct step의 SOA는 앞 step duration 이상이어야 합니다."
+            "모든 타이밍 값은 동일한 end-to-start ISI입니다. 앞 자모의 전체 촉각 자극이 끝난 뒤 "
+            "설정한 시간만큼 기다리고 다음 자모를 시작합니다. 자극 길이가 길어도 겹침 예외가 생기지 않습니다."
         )
         gh.setObjectName("Hint"); gh.setWordWrap(True); gl.addWidget(gh)
-        self.default_comp_gap = self._labeled_spin(gl, "Composite 기본 SOA", 0, 5000, 350)
+        self.default_comp_gap = self._labeled_spin(gl, "Composite 기본 ISI", 0, 5000, 150)
 
         duration_hint = QLabel(
-            "자→모 SOA는 앞 자음의 실제 duration으로 자동 분기합니다. 기본 기준은 300 ms이며, "
-            "자음·모션 duration 기준은 아래 고급 설정에서 바꿀 수 있습니다."
+            "자→모 ISI는 앞 자음의 실제 duration으로 짧음/김 행을 선택합니다. "
+            "선택된 값도 항상 앞 자극 종료 후 기다리는 시간입니다."
         )
         duration_hint.setObjectName("Hint"); duration_hint.setWordWrap(True); gl.addWidget(duration_hint)
         self.duration_rule_summary = QLabel("")
         self.duration_rule_summary.setObjectName("Hint")
         self.duration_rule_summary.setWordWrap(True)
         gl.addWidget(self.duration_rule_summary)
-        self.cv_short_soa = self._labeled_spin(gl, "CV · 짧은 자음→모음 SOA", 0, 5000, 450)
-        self.cv_long_soa = self._labeled_spin(gl, "CV · 긴 자음→모음 SOA", 0, 5000, 700)
-        self.cvc_cv_short_soa = self._labeled_spin(gl, "CVC · 짧은 첫 자음→모음 SOA", 0, 5000, 450)
-        self.cvc_cv_long_soa = self._labeled_spin(gl, "CVC · 긴 첫 자음→모음 SOA", 0, 5000, 700)
+        self.cv_short_isi = self._labeled_spin(gl, "CV · 짧은 자음→모음 ISI", 0, 5000, 250)
+        self.cv_long_isi = self._labeled_spin(gl, "CV · 긴 자음→모음 ISI", 0, 5000, 250)
+        self.cvc_cv_short_isi = self._labeled_spin(gl, "CVC · 짧은 첫 자음→모음 ISI", 0, 5000, 250)
+        self.cvc_cv_long_isi = self._labeled_spin(gl, "CVC · 긴 첫 자음→모음 ISI", 0, 5000, 250)
         # Compatibility aliases used by a few older helper methods.
-        self.cv_gap = self.cv_short_soa
-        self.cvc_cv_gap = self.cvc_cv_short_soa
+        self.cv_gap = self.cv_short_isi
+        self.cvc_cv_gap = self.cvc_cv_short_isi
 
-        self.cvc_vc_gap = self._labeled_spin(gl, "CVC · 모음→끝 자음 SOA", 0, 5000, 450)
-        self.comp_final_gap = self._labeled_spin(gl, "복합 종성 onset 간격", 0, 5000, 350)
+        self.cvc_vc_gap = self._labeled_spin(gl, "CVC · 모음→끝 자음 ISI", 0, 5000, 250)
+        self.comp_final_gap = self._labeled_spin(gl, "복합 종성 내부 ISI", 0, 5000, 150)
         self.syllable_gap = self._labeled_spin(gl, "음절 경계 ISI", 0, 7000, 350)
         self.word_gap = self._labeled_spin(gl, "단어 경계 ISI", 0, 10000, 650)
         self.default_comp_gap.setToolTip(
-            "Composite에서 + Step을 누를 때 이전 Step onset부터 새 Step onset까지의 기본값입니다. "
-            "기존 행의 개별 SOA는 자동으로 바뀌지 않습니다."
+            "Composite에서 앞 Step이 완전히 끝난 뒤 새 Step을 시작하기까지의 기본 대기시간입니다. "
+            "기존 행의 개별 ISI는 자동으로 바뀌지 않습니다."
         )
-        self.cv_short_soa.setToolTip("받침 없는 CV에서 짧은 초성 시작부터 모음 시작까지")
-        self.cv_long_soa.setToolTip("받침 없는 CV에서 긴 초성 시작부터 모음 시작까지")
-        self.cvc_cv_short_soa.setToolTip("받침 있는 CVC에서 짧은 초성 시작부터 모음 시작까지")
-        self.cvc_cv_long_soa.setToolTip("받침 있는 CVC에서 긴 초성 시작부터 모음 시작까지")
-        self.cvc_vc_gap.setToolTip("받침 있는 CVC에서 모음 시작부터 종성 시작까지")
-        self.comp_final_gap.setToolTip("ㄳ, ㄵ, ㄺ 등 복합 종성의 첫 자음 onset부터 둘째 자음 onset까지")
+        self.cv_short_isi.setToolTip("고급 CV 행렬의 ‘짧음’ 행 전체와 연결됩니다.")
+        self.cv_long_isi.setToolTip("고급 CV 행렬의 ‘김’ 행 전체와 연결됩니다.")
+        self.cvc_cv_short_isi.setToolTip("고급 CVC 첫 자음→모음 행렬의 ‘짧음’ 행 전체와 연결됩니다.")
+        self.cvc_cv_long_isi.setToolTip("고급 CVC 첫 자음→모음 행렬의 ‘김’ 행 전체와 연결됩니다.")
+        self.cvc_vc_gap.setToolTip("받침 있는 CVC에서 모음 자극 종료 후 종성 시작까지 기다리는 시간")
+        self.comp_final_gap.setToolTip("ㄳ, ㄵ, ㄺ 등에서 첫 종성 자극 종료 후 둘째 종성 시작까지 기다리는 시간")
         self.syllable_gap.setToolTip("앞 음절의 마지막 모터 자극이 완전히 끝난 뒤 다음 음절 초성 시작까지")
         self.word_gap.setToolTip("앞 단어의 마지막 모터 자극이 완전히 끝난 뒤 다음 단어 첫 초성 시작까지")
         self.default_comp_gap.valueChanged.connect(self.on_default_composite_gap_changed)
         for sp in (
-            self.cv_short_soa, self.cv_long_soa,
-            self.cvc_cv_short_soa, self.cvc_cv_long_soa,
+            self.cv_short_isi, self.cv_long_isi,
+            self.cvc_cv_short_isi, self.cvc_cv_long_isi,
             self.cvc_vc_gap, self.comp_final_gap, self.syllable_gap, self.word_gap,
         ):
             sp.valueChanged.connect(self.sync_model_from_setup_controls)
-        advanced_btn = button("고급 duration·유형·pair SOA", "secondary")
+        advanced_btn = button("고급 duration·유형·pair ISI", "secondary")
         advanced_btn.setToolTip(
-            "자음/모션 duration 분기 기준, 짧은·긴 모션 SOA 행렬, 특정 자모 pair override를 설정합니다."
+            "자음/모션 duration 분기 기준, 자극 종류별 ISI 행렬, 특정 자모 pair override를 설정합니다."
         )
         advanced_btn.clicked.connect(self.open_timing_rules)
         gl.addWidget(advanced_btn)
@@ -2097,9 +2607,9 @@ class MainWindow(QMainWindow):
         gl.addWidget(estimate_card)
 
         explain = QLabel(
-            "예: 자음 기준 300 ms이면 300 ms는 짧은 SOA, 550 ms는 긴 SOA 사용\n"
-            "모션도 고급 설정의 기준에 따라 짧은 모션/긴 모션 SOA 행렬을 사용\n"
-            "음절·단어 경계는 앞 자극 종료 후 ISI"
+            "예: 자음 duration 1000 ms + ISI 200 ms → 다음 자모는 1200 ms에 시작\n"
+            "짧음/김/모션 유형은 어떤 ISI 행을 고를지만 결정\n"
+            "Composite·CV·CVC·음절·단어 모두 같은 ISI 의미"
         )
         explain.setObjectName("MiniCard")
         explain.setWordWrap(True)
@@ -2114,7 +2624,7 @@ class MainWindow(QMainWindow):
         root = QVBoxLayout(page); root.setContentsMargins(0, 0, 0, 0); root.setSpacing(16)
         hero = card(); hl = QVBoxLayout(hero); hl.setContentsMargins(32, 28, 32, 28); hl.setSpacing(14)
         title = QLabel("입력한 한글을 바로 느껴보기"); title.setObjectName("HeroTitle"); hl.addWidget(title)
-        sub = QLabel("예: 각, 한글, 의. 현재 저장된 디자인과 onset-to-onset SOA 규칙으로 command를 생성합니다.")
+        sub = QLabel("예: 각, 한글, 의. 현재 저장된 디자인과 end-to-start ISI 규칙으로 command를 생성합니다.")
         sub.setObjectName("Hint"); hl.addWidget(sub)
         row = QHBoxLayout()
         self.simple_input = QLineEdit(); self.simple_input.setPlaceholderText("각"); self.simple_input.setMinimumHeight(58)
@@ -2131,6 +2641,275 @@ class MainWindow(QMainWindow):
         self.simple_summary = QLabel("아직 컴파일된 자극이 없습니다."); self.simple_summary.setObjectName("SectionTitle"); dl.addWidget(self.simple_summary)
         self.simple_command = QPlainTextEdit(); self.simple_command.setReadOnly(True); dl.addWidget(self.simple_command, 1)
         root.addWidget(details, 1)
+        return page
+
+
+    def build_learning_page(self) -> QWidget:
+        """Build a multiple-choice learning page for selected jamo groups."""
+        page = QScrollArea()
+        page.setObjectName("LearningScroll")
+        page.setWidgetResizable(True)
+        page.setFrameShape(QFrame.NoFrame)
+        page.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        page.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        content = QWidget()
+        content.setObjectName("LearningScrollBody")
+        root = QVBoxLayout(content)
+        root.setContentsMargins(0, 0, 8, 0)
+        root.setSpacing(14)
+        page.setWidget(content)
+
+        config = card()
+        cl = QGridLayout(config)
+        cl.setContentsMargins(24, 20, 24, 20)
+        cl.setHorizontalSpacing(14)
+        cl.setVerticalSpacing(10)
+
+        title = QLabel("선택 자모 학습")
+        title.setObjectName("SectionTitle")
+        cl.addWidget(title, 0, 0, 1, 6)
+
+        intro = QLabel(
+            "학습할 자모 그룹을 선택하면 해당 자모의 촉각 자극을 무작위로 제시하고, "
+            "화면에 나타난 보기 중 하나를 눌러 맞히는 연습을 진행합니다."
+        )
+        intro.setObjectName("Hint")
+        intro.setWordWrap(True)
+        cl.addWidget(intro, 1, 0, 1, 6)
+
+        cl.addWidget(QLabel("학습 그룹"), 2, 0)
+        self.learning_basic_consonant_check = QCheckBox("기본 자음 14개")
+        self.learning_basic_consonant_check.setChecked(True)
+        self.learning_double_consonant_check = QCheckBox("쌍자음 5개")
+        self.learning_basic_vowel_check = QCheckBox("기본 모음 14개")
+        self.learning_compound_vowel_check = QCheckBox("복합 모음 7개")
+        cl.addWidget(self.learning_basic_consonant_check, 2, 1)
+        cl.addWidget(self.learning_double_consonant_check, 2, 2)
+        cl.addWidget(self.learning_basic_vowel_check, 3, 1)
+        cl.addWidget(self.learning_compound_vowel_check, 3, 2)
+
+        cl.addWidget(QLabel("문제 수"), 2, 4)
+        self.learning_trials = QSpinBox()
+        self.learning_trials.setRange(1, 1000)
+        self.learning_trials.setValue(40)
+        self.learning_trials.setSuffix(" 회")
+        cl.addWidget(self.learning_trials, 2, 5)
+
+        cl.addWidget(QLabel("보기 수"), 3, 4)
+        self.learning_choice_count = QSpinBox()
+        self.learning_choice_count.setRange(2, 8)
+        self.learning_choice_count.setValue(4)
+        self.learning_choice_count.setSuffix(" 개")
+        self.learning_choice_count.setToolTip(
+            "정답을 포함한 보기 개수입니다. 선택한 전체 자모 수보다 많으면 가능한 수만 표시합니다."
+        )
+        cl.addWidget(self.learning_choice_count, 3, 5)
+
+        cl.addWidget(QLabel("세션 ID"), 4, 0)
+        self.learning_session_edit = QLineEdit()
+        self.learning_session_edit.setPlaceholderText("선택 사항 · 예: jamo_practice01")
+        cl.addWidget(self.learning_session_edit, 4, 1, 1, 3)
+        self.learning_start_btn = button("선택 학습 시작", "primary")
+        self.learning_start_btn.clicked.connect(self.start_learning_session)
+        cl.addWidget(self.learning_start_btn, 4, 4, 1, 2)
+
+        group_hint = QLabel(
+            "여러 그룹을 함께 선택할 수 있습니다. 선택된 그룹은 문제 수 안에서 가능한 한 균형 있게 출제되며, "
+            "같은 그룹 안에서는 모든 자모가 한 번씩 나온 뒤 다시 섞입니다."
+        )
+        group_hint.setObjectName("Hint")
+        group_hint.setWordWrap(True)
+        cl.addWidget(group_hint, 5, 0, 1, 6)
+        root.addWidget(config)
+
+        stage = card()
+        st = QVBoxLayout(stage)
+        st.setContentsMargins(26, 22, 26, 22)
+        st.setSpacing(14)
+
+        self.learning_progress = QLabel("학습을 시작하세요.")
+        self.learning_progress.setObjectName("Eyebrow")
+        st.addWidget(self.learning_progress)
+
+        self.learning_instruction = QLabel("학습 그룹을 선택한 뒤 선택 학습 시작을 누르세요.")
+        self.learning_instruction.setObjectName("HeroTitle")
+        self.learning_instruction.setAlignment(Qt.AlignCenter)
+        self.learning_instruction.setWordWrap(True)
+        st.addWidget(self.learning_instruction)
+
+        self.learning_feedback = QLabel("")
+        self.learning_feedback.setObjectName("Feedback")
+        self.learning_feedback.setAlignment(Qt.AlignCenter)
+        self.learning_feedback.setWordWrap(True)
+        st.addWidget(self.learning_feedback)
+
+        choice_title = QLabel("보기")
+        choice_title.setObjectName("EstimatorTitle")
+        st.addWidget(choice_title)
+
+        self.learning_choice_widget = QWidget()
+        self.learning_choice_layout = QGridLayout(self.learning_choice_widget)
+        self.learning_choice_layout.setContentsMargins(0, 0, 0, 0)
+        self.learning_choice_layout.setHorizontalSpacing(12)
+        self.learning_choice_layout.setVerticalSpacing(12)
+        st.addWidget(self.learning_choice_widget, 1)
+
+        action_row = QHBoxLayout()
+        self.learning_replay_btn = button("자극 다시 재생", "secondary")
+        self.learning_replay_btn.setEnabled(False)
+        self.learning_replay_btn.clicked.connect(lambda: self.play_learning_stimulus(replay=True))
+        self.learning_next_btn = button("다음 문제", "primary")
+        self.learning_next_btn.setEnabled(False)
+        self.learning_next_btn.clicked.connect(self.next_learning_trial)
+        action_row.addWidget(self.learning_replay_btn)
+        action_row.addStretch(1)
+        action_row.addWidget(self.learning_next_btn)
+        st.addLayout(action_row)
+
+        stage.setMinimumHeight(480)
+        root.addWidget(stage, 1)
+        return page
+
+    def build_general_quiz_page(self) -> QWidget:
+        """Build a text-answer tactile quiz for random CV/CVC syllables."""
+        page = QScrollArea()
+        page.setObjectName("GeneralQuizScroll")
+        page.setWidgetResizable(True)
+        page.setFrameShape(QFrame.NoFrame)
+        page.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        page.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        content = QWidget()
+        content.setObjectName("GeneralQuizScrollBody")
+        root = QVBoxLayout(content)
+        root.setContentsMargins(0, 0, 8, 0)
+        root.setSpacing(14)
+        page.setWidget(content)
+
+        config = card()
+        cl = QGridLayout(config)
+        cl.setContentsMargins(24, 20, 24, 20)
+        cl.setHorizontalSpacing(14)
+        cl.setVerticalSpacing(10)
+        title = QLabel("일반 촉각 퀴즈")
+        title.setObjectName("SectionTitle")
+        cl.addWidget(title, 0, 0, 1, 6)
+
+        intro = QLabel(
+            "syllable_top200.xlsx에 실제로 들어 있는 음절만 사용합니다. 파일 셀에 단어가 있으면 "
+            "한글 음절 단위로 모두 잘라 중복 없이 출제하며, 선택한 CV/CVC 및 자모 그룹으로 다시 필터링합니다. "
+            "답은 아래 채팅 입력창에 직접 입력합니다."
+        )
+        intro.setObjectName("Hint")
+        intro.setWordWrap(True)
+        cl.addWidget(intro, 1, 0, 1, 6)
+
+        cl.addWidget(QLabel("음절 구조"), 2, 0)
+        self.gq_cv_check = QCheckBox("자+모 (CV)")
+        self.gq_cv_check.setChecked(True)
+        self.gq_cvc_check = QCheckBox("자+모+자 (CVC)")
+        self.gq_cvc_check.setChecked(True)
+        cl.addWidget(self.gq_cv_check, 2, 1)
+        cl.addWidget(self.gq_cvc_check, 2, 2)
+        cl.addWidget(QLabel("문제 수"), 2, 4)
+        self.gq_trials = QSpinBox()
+        self.gq_trials.setRange(1, 1000)
+        self.gq_trials.setValue(40)
+        self.gq_trials.setSuffix(" 회")
+        cl.addWidget(self.gq_trials, 2, 5)
+
+        cl.addWidget(QLabel("초성/종성"), 3, 0)
+        self.gq_basic_consonant_check = QCheckBox("기본 자음 14개")
+        self.gq_basic_consonant_check.setChecked(True)
+        self.gq_double_consonant_check = QCheckBox("쌍자음 5개")
+        self.gq_double_consonant_check.setChecked(True)
+        cl.addWidget(self.gq_basic_consonant_check, 3, 1)
+        cl.addWidget(self.gq_double_consonant_check, 3, 2)
+
+        cl.addWidget(QLabel("중성"), 4, 0)
+        self.gq_basic_vowel_check = QCheckBox("기본 모음 14개")
+        self.gq_basic_vowel_check.setChecked(True)
+        self.gq_diphthong_check = QCheckBox("이중모음 7개")
+        self.gq_diphthong_check.setChecked(True)
+        cl.addWidget(self.gq_basic_vowel_check, 4, 1)
+        cl.addWidget(self.gq_diphthong_check, 4, 2)
+
+        cl.addWidget(QLabel("출제 음절 XLSX"), 5, 0)
+        self.gq_syllable_edit = QLineEdit(str(APP_DIR / "syllable_top200.xlsx"))
+        self.gq_syllable_edit.setPlaceholderText("syllable_top200.xlsx 경로")
+        cl.addWidget(self.gq_syllable_edit, 5, 1, 1, 4)
+        gq_syllable_btn = button("찾기", "ghost")
+        gq_syllable_btn.clicked.connect(self.choose_general_quiz_syllable)
+        cl.addWidget(gq_syllable_btn, 5, 5)
+
+        cl.addWidget(QLabel("세션 ID"), 6, 0)
+        self.gq_session_edit = QLineEdit()
+        self.gq_session_edit.setPlaceholderText("선택 사항 · 예: practice01")
+        cl.addWidget(self.gq_session_edit, 6, 1, 1, 3)
+        self.gq_start_btn = button("Top200 퀴즈 시작", "primary")
+        self.gq_start_btn.clicked.connect(self.start_general_quiz)
+        cl.addWidget(self.gq_start_btn, 6, 4, 1, 2)
+
+        final_hint = QLabel(
+            "출제 후보는 XLSX에서 읽은 음절에 한정됩니다. CVC 종성은 선택한 자음 가운데 실제 한글 종성으로 "
+            "가능한 한 글자 자음만 사용하며, ㄸ·ㅃ·ㅉ과 ㄳ·ㄺ 같은 복합 종성은 제외됩니다."
+        )
+        final_hint.setObjectName("Hint")
+        final_hint.setWordWrap(True)
+        cl.addWidget(final_hint, 7, 0, 1, 6)
+        root.addWidget(config)
+
+        stage = card()
+        st = QVBoxLayout(stage)
+        st.setContentsMargins(26, 22, 26, 22)
+        st.setSpacing(12)
+        self.gq_progress = QLabel("퀴즈를 시작하세요.")
+        self.gq_progress.setObjectName("Eyebrow")
+        st.addWidget(self.gq_progress)
+        self.gq_instruction = QLabel("옵션을 선택한 뒤 랜덤 퀴즈 시작을 누르세요.")
+        self.gq_instruction.setObjectName("HeroTitle")
+        self.gq_instruction.setWordWrap(True)
+        st.addWidget(self.gq_instruction)
+
+        self.gq_feedback = QLabel("")
+        self.gq_feedback.setObjectName("Feedback")
+        self.gq_feedback.setAlignment(Qt.AlignCenter)
+        self.gq_feedback.setWordWrap(True)
+        st.addWidget(self.gq_feedback)
+
+        self.gq_chat = QPlainTextEdit()
+        self.gq_chat.setObjectName("GeneralQuizChat")
+        self.gq_chat.setReadOnly(True)
+        self.gq_chat.setMinimumHeight(250)
+        self.gq_chat.setPlaceholderText("퀴즈 대화가 여기에 표시됩니다.")
+        st.addWidget(self.gq_chat, 1)
+
+        answer_row = QHBoxLayout()
+        self.gq_answer = QLineEdit()
+        self.gq_answer.setPlaceholderText("느낀 음절을 입력하세요. 예: 가 또는 ㄱㅏ")
+        self.gq_answer.setMinimumHeight(56)
+        self.gq_answer.setEnabled(False)
+        self.gq_answer.returnPressed.connect(self.submit_general_quiz_answer)
+        self.gq_submit_btn = button("답변 전송", "primary")
+        self.gq_submit_btn.setEnabled(False)
+        self.gq_submit_btn.clicked.connect(self.submit_general_quiz_answer)
+        answer_row.addWidget(self.gq_answer, 1)
+        answer_row.addWidget(self.gq_submit_btn)
+        st.addLayout(answer_row)
+
+        action_row = QHBoxLayout()
+        self.gq_replay_btn = button("자극 다시 재생", "secondary")
+        self.gq_replay_btn.setEnabled(False)
+        self.gq_replay_btn.clicked.connect(lambda: self.play_general_quiz_stimulus(replay=True))
+        self.gq_next_btn = button("다음 문제", "secondary")
+        self.gq_next_btn.setEnabled(False)
+        self.gq_next_btn.clicked.connect(self.next_general_quiz_trial)
+        action_row.addWidget(self.gq_replay_btn)
+        action_row.addStretch(1)
+        action_row.addWidget(self.gq_next_btn)
+        st.addLayout(action_row)
+        stage.setMinimumHeight(470)
+        root.addWidget(stage, 1)
         return page
 
     def build_quiz_page(self) -> QWidget:
@@ -2197,8 +2976,8 @@ class MainWindow(QMainWindow):
         ack_hint.setObjectName("Hint")
         sl.addWidget(ack_hint, 4, 3, 1, 3)
         soa_fw_hint = QLabel(
-            "v8은 사용 중인 기존 Arduino 코드를 그대로 사용하며 raw의 /i, /d를 PWM 숫자로 바꾸지 않습니다. "
-            "기존 Arduino가 표현할 수 없는 staggered overlap은 자동 변환하지 않고 설정 오류로 알려줍니다. "
+            "현재 프로그램은 사용 중인 기존 Arduino 코드를 그대로 사용하며 raw의 /i, /d를 PWM 숫자로 바꾸지 않습니다. "
+            "모든 조합 타이밍은 end-to-start ISI라서 새 자모가 앞 자모 종료 전에 겹쳐 시작하지 않습니다. "
             "Arduino 코드는 지금 사용 중인 버전을 그대로 두면 됩니다."
         )
         soa_fw_hint.setObjectName("Hint")
@@ -2222,17 +3001,36 @@ class MainWindow(QMainWindow):
         return page
 
     def _labeled_spin(self, layout: QVBoxLayout, label: str, lo: int, hi: int, value: int) -> QSpinBox:
-        row = QHBoxLayout()
-        row.setSpacing(12)
-        row.addWidget(QLabel(label))
-        row.addStretch(1)
+        """Create a timing field that remains readable in a narrow side card.
+
+        Long Korean labels and a 180 px spin box could not reliably fit on one
+        row at Windows high-DPI scaling.  Stacking the label above a full-width
+        editor removes the horizontal clipping while the containing timing
+        panel continues to scroll vertically.
+        """
+        field = QFrame()
+        field.setObjectName("TimingField")
+        field_layout = QVBoxLayout(field)
+        field_layout.setContentsMargins(0, 2, 0, 4)
+        field_layout.setSpacing(6)
+
+        label_widget = QLabel(label)
+        label_widget.setObjectName("TimingFieldLabel")
+        label_widget.setWordWrap(True)
+        label_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        field_layout.addWidget(label_widget)
+
         sp = QSpinBox()
+        sp.setObjectName("TimingFieldSpin")
         sp.setRange(lo, hi)
         sp.setValue(value)
         sp.setSuffix(" ms")
-        sp.setMinimumWidth(180)
-        row.addWidget(sp)
-        layout.addLayout(row)
+        sp.setMinimumWidth(0)
+        sp.setMaximumWidth(16777215)
+        sp.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        field_layout.addWidget(sp)
+
+        layout.addWidget(field)
         return sp
 
     # --------- style ---------
@@ -2364,6 +3162,34 @@ class MainWindow(QMainWindow):
         QSpinBox::up-arrow {{ image: url("{up_url}"); width: 16px; height: 16px; }}
         QSpinBox::down-arrow {{ image: url("{down_url}"); width: 16px; height: 16px; }}
 
+        /* Full-width fields in the narrow right timing panel. */
+        QFrame#TimingField {{ background: transparent; border: none; }}
+        QLabel#TimingFieldLabel {{
+            color: #3A3A3C; font-size: 14px; font-weight: 650; padding: 0px 2px;
+        }}
+        QSpinBox#TimingFieldSpin {{
+            padding: 0px 48px 0px 14px;
+            min-height: 50px;
+        }}
+        QSpinBox#TimingFieldSpin::up-button {{ width: 40px; height: 25px; }}
+        QSpinBox#TimingFieldSpin::down-button {{ width: 40px; height: 25px; }}
+
+        /* Compact spin boxes used only inside the seven-column ISI matrix.
+           The global 58 px padding + 50 px buttons hid the last digit and
+           suffix when DPI scaling made a matrix cell narrow. */
+        QTableWidget#TimingMatrixTable QSpinBox#TimingMatrixSpin {{
+            margin: 4px 5px;
+            padding: 0px 34px 0px 8px;
+            min-height: 38px;
+            border-radius: 10px;
+        }}
+        QTableWidget#TimingMatrixTable QSpinBox#TimingMatrixSpin::up-button {{
+            width: 28px; height: 19px; border-top-right-radius: 9px;
+        }}
+        QTableWidget#TimingMatrixTable QSpinBox#TimingMatrixSpin::down-button {{
+            width: 28px; height: 19px; border-bottom-right-radius: 9px;
+        }}
+
         QTableWidget#StepsTable {{
             padding: 0px;
             border-radius: 16px;
@@ -2424,14 +3250,17 @@ class MainWindow(QMainWindow):
             border-bottom: 1px solid #DEDEE3; padding: 10px 9px; font-weight: 760;
             min-height: 28px;
         }}
-        QScrollArea#TimingScroll {{
+        QScrollArea#TimingScroll,
+        QScrollArea#TimingRulesScroll {{
             background: transparent;
             border: none;
         }}
-        QScrollArea#TimingScroll > QWidget > QWidget {{
+        QScrollArea#TimingScroll > QWidget > QWidget,
+        QScrollArea#TimingRulesScroll > QWidget > QWidget {{
             background: transparent;
         }}
-        QWidget#TimingScrollBody {{ background: transparent; }}
+        QWidget#TimingScrollBody,
+        QWidget#TimingRulesScrollBody {{ background: transparent; }}
         QFrame#EstimatorCard {{
             background: #F6F6F8;
             border: 1px solid #E1E1E6;
@@ -2445,6 +3274,13 @@ class MainWindow(QMainWindow):
         QScrollBar::handle:vertical {{ background: #C7C7CC; border-radius: 5px; min-height: 32px; }}
         QScrollBar::handle:vertical:hover {{ background: #AEAEB2; }}
         QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{ height: 0px; }}
+        QScrollArea#GeneralQuizScroll {{ background: transparent; border: none; }}
+        QScrollArea#GeneralQuizScroll > QWidget > QWidget {{ background: transparent; }}
+        QWidget#GeneralQuizScrollBody {{ background: transparent; }}
+        QPlainTextEdit#GeneralQuizChat {{
+            background: #F6F6F8; border: 1px solid #E1E1E6; border-radius: 18px;
+            padding: 16px; font-size: 16px; line-height: 1.45;
+        }}
         QToolTip {{ background: #3A3A3C; color: white; border: none; border-radius: 8px; padding: 6px; }}
         """)
         for b in self.findChildren(QPushButton):
@@ -2512,27 +3348,32 @@ class MainWindow(QMainWindow):
             return
         try:
             with open(path, "r", encoding="utf-8") as f:
-                self.setup = DesignSetup.from_dict(json.load(f))
+                raw_setup = json.load(f)
+            previous_version = int(raw_setup.get("timing_semantics_version", 1) or 1)
+            self.setup = DesignSetup.from_dict(raw_setup)
             self.setup_path = Path(path)
-            self.dirty = False
+            self.dirty = previous_version < 6
             self.sync_setup_controls_from_model()
             self.refresh_jamo_lists()
             self.mapping_editor.load_label("ㄱ")
             self.update_setup_title()
-            self.toast(f"불러옴 · {self.setup_path.name}")
+            if previous_version < 6:
+                self.toast("기존 SOA 셋업을 ISI로 변환해 불러왔습니다. 저장하면 v17 형식으로 저장됩니다.")
+            else:
+                self.toast(f"불러옴 · {self.setup_path.name}")
         except Exception as exc:
             QMessageBox.critical(self, "불러오기 실패", str(exc))
 
     def sync_setup_controls_from_model(self) -> None:
         defaults = self.setup.timing_defaults_ms
         for widget, value in [
-            (self.default_comp_gap, defaults.get("composite", 350)),
-            (self.cv_short_soa, self.setup.cv_short_soa_ms),
-            (self.cv_long_soa, self.setup.cv_long_soa_ms),
-            (self.cvc_cv_short_soa, self.setup.cvc_cv_short_soa_ms),
-            (self.cvc_cv_long_soa, self.setup.cvc_cv_long_soa_ms),
-            (self.cvc_vc_gap, defaults.get("cvc_vc", 450)),
-            (self.comp_final_gap, defaults.get("compound_final", 350)),
+            (self.default_comp_gap, defaults.get("composite", 150)),
+            (self.cv_short_isi, self.setup.cv_short_isi_ms),
+            (self.cv_long_isi, self.setup.cv_long_isi_ms),
+            (self.cvc_cv_short_isi, self.setup.cvc_cv_short_isi_ms),
+            (self.cvc_cv_long_isi, self.setup.cvc_cv_long_isi_ms),
+            (self.cvc_vc_gap, defaults.get("cvc_vc", 250)),
+            (self.comp_final_gap, defaults.get("compound_final", 150)),
             (self.syllable_gap, self.setup.inter_syllable_isi_ms),
             (self.word_gap, self.setup.inter_word_isi_ms),
         ]:
@@ -2542,7 +3383,7 @@ class MainWindow(QMainWindow):
         self.baud_spin.setValue(self.setup.baudrate)
         self.motor_map_edit.setText(",".join(str(self.setup.logical_to_motor[str(i)]) for i in range(1, 10)))
         if hasattr(self, "mapping_editor"):
-            self.mapping_editor.set_default_composite_gap(self.setup.timing_defaults_ms.get("composite", 350))
+            self.mapping_editor.set_default_composite_gap(self.setup.timing_defaults_ms.get("composite", 150))
         self.update_duration_rule_summary()
         self.update_duration_estimate()
 
@@ -2555,42 +3396,66 @@ class MainWindow(QMainWindow):
     def sync_model_from_setup_controls(self) -> None:
         if not hasattr(self, "cv_gap"):
             return
-        self.setup.timing_semantics_version = 4
-        new_defaults = {
-            "composite": self.default_comp_gap.value(),
-            # Keep these fallback defaults synchronized with the short-duration
-            # values for old setup compatibility and advanced pair dialogs.
-            "cv": self.cv_short_soa.value(),
-            "cvc_cv": self.cvc_cv_short_soa.value(),
-            "cvc_vc": self.cvc_vc_gap.value(),
-            "compound_final": self.comp_final_gap.value(),
+
+        setup = self.setup
+        setup.timing_semantics_version = 6
+        setup.ensure_timing_matrix()
+
+        old_cv_values = {
+            ("cv", "short"): int(setup.cv_short_isi_ms),
+            ("cv", "long"): int(setup.cv_long_isi_ms),
+            ("cvc_cv", "short"): int(setup.cvc_cv_short_isi_ms),
+            ("cvc_cv", "long"): int(setup.cvc_cv_long_isi_ms),
         }
-        # Matrix cells that still equal the old default behave like inherited
-        # values and follow the basic control. Deliberately customized cells are
-        # left untouched.
-        for context, new_value in new_defaults.items():
-            old_value = int(self.setup.timing_defaults_ms.get(context, new_value))
-            rows = self.setup.timing_matrix_ms.get(context, {})
+        new_cv_values = {
+            ("cv", "short"): int(self.cv_short_isi.value()),
+            ("cv", "long"): int(self.cv_long_isi.value()),
+            ("cvc_cv", "short"): int(self.cvc_cv_short_isi.value()),
+            ("cvc_cv", "long"): int(self.cvc_cv_long_isi.value()),
+        }
+
+        # Non-CV basic defaults retain the earlier inherited-cell behavior:
+        # cells that still equal the old default follow the new default, while
+        # deliberately customized advanced cells remain untouched.
+        non_cv_defaults = {
+            "composite": int(self.default_comp_gap.value()),
+            "cvc_vc": int(self.cvc_vc_gap.value()),
+            "compound_final": int(self.comp_final_gap.value()),
+        }
+        for context, new_value in non_cv_defaults.items():
+            old_value = int(setup.timing_defaults_ms.get(context, new_value))
+            rows = setup.timing_matrix_ms.get(context, {})
             for cols in rows.values():
                 for next_cls, cell_value in list(cols.items()):
                     if int(cell_value) == old_value:
                         cols[next_cls] = int(new_value)
-        self.setup.timing_defaults_ms.update(new_defaults)
-        self.setup.cv_short_soa_ms = self.cv_short_soa.value()
-        self.setup.cv_long_soa_ms = self.cv_long_soa.value()
-        self.setup.cvc_cv_short_soa_ms = self.cvc_cv_short_soa.value()
-        self.setup.cvc_cv_long_soa_ms = self.cvc_cv_long_soa.value()
-        self.setup.use_duration_based_cv_soa = True
-        self.setup.inter_syllable_isi_ms = self.syllable_gap.value()
-        self.setup.inter_word_isi_ms = self.word_gap.value()
+            setup.timing_defaults_ms[context] = int(new_value)
+
+        # The four CV controls are explicit row-wide controls. Only a control
+        # that actually changed rewrites its linked row, preventing unrelated
+        # settings from erasing advanced edits.
+        for key, new_value in new_cv_values.items():
+            if new_value != old_cv_values[key]:
+                setup.set_uniform_timing_row(key[0], key[1], new_value)
+
+        setup.cv_short_isi_ms = new_cv_values[("cv", "short")]
+        setup.cv_long_isi_ms = new_cv_values[("cv", "long")]
+        setup.cvc_cv_short_isi_ms = new_cv_values[("cvc_cv", "short")]
+        setup.cvc_cv_long_isi_ms = new_cv_values[("cvc_cv", "long")]
+        setup.timing_defaults_ms["cv"] = int(setup.cv_short_isi_ms)
+        setup.timing_defaults_ms["cvc_cv"] = int(setup.cvc_cv_short_isi_ms)
+        setup.use_duration_based_cv_isi = True
+        setup.inter_syllable_isi_ms = self.syllable_gap.value()
+        setup.inter_word_isi_ms = self.word_gap.value()
+
         # Keep deprecated fields synchronized only for human readability in old tools.
-        self.setup.default_composite_gap_ms = self.default_comp_gap.value()
-        self.setup.cv_gap_ms = self.cv_gap.value()
-        self.setup.cvc_cv_gap_ms = self.cvc_cv_gap.value()
-        self.setup.cvc_vc_gap_ms = self.cvc_vc_gap.value()
-        self.setup.compound_final_gap_ms = self.comp_final_gap.value()
-        self.setup.inter_syllable_gap_ms = self.setup.inter_syllable_isi_ms
-        self.setup.inter_word_gap_ms = self.setup.inter_word_isi_ms
+        setup.default_composite_gap_ms = self.default_comp_gap.value()
+        setup.cv_gap_ms = self.cv_gap.value()
+        setup.cvc_cv_gap_ms = self.cvc_cv_gap.value()
+        setup.cvc_vc_gap_ms = self.cvc_vc_gap.value()
+        setup.compound_final_gap_ms = self.comp_final_gap.value()
+        setup.inter_syllable_gap_ms = setup.inter_syllable_isi_ms
+        setup.inter_word_gap_ms = setup.inter_word_isi_ms
         self.mark_dirty()
         self.update_duration_estimate()
         if hasattr(self, "mapping_editor"):
@@ -2672,7 +3537,7 @@ class MainWindow(QMainWindow):
 
         if not word_durations:
             self.duration_estimate_value.setText("계산 불가")
-            self.duration_estimate_note.setText("현재 SOA 규칙으로 단어를 컴파일할 수 없습니다.")
+            self.duration_estimate_note.setText("현재 ISI 규칙으로 단어를 컴파일할 수 없습니다.")
             return
 
         avg_syllable_ms = sum(syllable_durations) / len(syllable_durations)
@@ -2685,7 +3550,7 @@ class MainWindow(QMainWindow):
         self.duration_estimate_note.setText(
             f"평균 음절 물리 duration {avg_syllable_ms / 1000.0:.2f}초 · "
             f"단어 onset 주기 {avg_cycle_ms / 1000.0:.2f}초 · 약 {words_per_min:.1f}단어/분\n"
-            f"내부 SOA + 경계 ISI 반영 · 기준: {source} · 컴파일 성공 {len(valid)}/{len(labels)}개"
+            f"모든 내부·경계 ISI 반영 · 기준: {source} · 컴파일 성공 {len(valid)}/{len(labels)}개"
         )
 
     def update_duration_rule_summary(self) -> None:
@@ -2693,7 +3558,7 @@ class MainWindow(QMainWindow):
             self.duration_rule_summary.setText(
                 f"현재 분기 기준 · 자음 {int(self.setup.cv_duration_split_ms)} ms · "
                 f"모션 {int(self.setup.motion_duration_split_ms)} ms "
-                "(기준 이하 = 짧음)"
+                "(기준 이하 = 짧음) · CV 짧음/김 행은 고급 행렬과 동일"
             )
 
     def open_timing_rules(self) -> None:
@@ -2820,10 +3685,627 @@ class MainWindow(QMainWindow):
             try: self.send_command(command)
             except Exception as exc: QMessageBox.critical(self, "자극 오류", str(exc))
 
+
+    # --------- selected jamo learning ---------
+    def _selected_learning_groups(self) -> Dict[str, List[str]]:
+        groups: Dict[str, List[str]] = {}
+        if self.learning_basic_consonant_check.isChecked():
+            groups["기본 자음"] = list(BASIC_CONSONANTS)
+        if self.learning_double_consonant_check.isChecked():
+            groups["쌍자음"] = list(DOUBLE_CONSONANTS)
+        if self.learning_basic_vowel_check.isChecked():
+            groups["기본 모음"] = list(BASIC_VOWELS)
+        if self.learning_compound_vowel_check.isChecked():
+            groups["복합 모음"] = list(DIPHTHONG_VOWELS)
+        if not groups:
+            raise RuntimeError("학습할 자모 그룹을 하나 이상 선택하세요.")
+        return groups
+
+    def _build_learning_candidates(
+        self,
+        groups: Dict[str, List[str]],
+    ) -> Dict[str, List[Dict[str, Any]]]:
+        compiler = HangulCompiler(self.setup)
+        candidates: Dict[str, List[Dict[str, Any]]] = {}
+        compile_errors: List[str] = []
+        for group_name, labels in groups.items():
+            items: List[Dict[str, Any]] = []
+            for label in labels:
+                try:
+                    command = compiler.compile_jamo(label)
+                    if command:
+                        items.append({
+                            "group": group_name,
+                            "target": label,
+                            "command": command,
+                        })
+                except Exception as exc:
+                    compile_errors.append(f"{label}: {exc}")
+            candidates[group_name] = items
+
+        empty_groups = [name for name, items in candidates.items() if not items]
+        if empty_groups:
+            detail = "\n".join(compile_errors[:12])
+            message = "현재 디자인으로 학습 가능한 자모가 없는 그룹: " + ", ".join(empty_groups)
+            if detail:
+                message += "\n\n컴파일 오류 예시:\n" + detail
+            raise RuntimeError(message)
+        return candidates
+
+    @staticmethod
+    def _make_learning_plan(
+        candidates: Dict[str, List[Dict[str, Any]]],
+        trial_count: int,
+    ) -> List[Dict[str, Any]]:
+        available_groups = [name for name, items in candidates.items() if items]
+        if not available_groups:
+            return []
+        rng = random.Random(time.time_ns())
+        bags: Dict[str, List[Dict[str, Any]]] = {name: [] for name in available_groups}
+        plan: List[Dict[str, Any]] = []
+
+        while len(plan) < int(trial_count):
+            group_cycle = list(available_groups)
+            rng.shuffle(group_cycle)
+            for group_name in group_cycle:
+                if len(plan) >= int(trial_count):
+                    break
+                if not bags[group_name]:
+                    bags[group_name] = [dict(item) for item in candidates[group_name]]
+                    rng.shuffle(bags[group_name])
+                item = bags[group_name].pop()
+                if plan and item["target"] == plan[-1]["target"] and bags[group_name]:
+                    alternate = bags[group_name].pop()
+                    bags[group_name].append(item)
+                    item = alternate
+                plan.append(item)
+        return plan
+
+    def _learning_all_labels(self) -> List[str]:
+        labels: List[str] = []
+        for group_items in getattr(self, "_learning_candidates", {}).values():
+            labels.extend(str(item["target"]) for item in group_items)
+        return list(dict.fromkeys(labels))
+
+    def _learning_choices_for_target(self, target: str, count: int) -> List[str]:
+        pool = self._learning_all_labels()
+        if target not in pool:
+            pool.append(target)
+        choice_count = min(max(2, int(count)), len(pool))
+        distractors = [label for label in pool if label != target]
+        rng = random.Random(time.time_ns() ^ (self.learning_index + 1))
+        rng.shuffle(distractors)
+        choices = [target] + distractors[:max(0, choice_count - 1)]
+        rng.shuffle(choices)
+        return choices
+
+    def _render_learning_choices(self, choices: Sequence[str]) -> None:
+        clear_layout(self.learning_choice_layout)
+        self.learning_choice_buttons = []
+        count = len(choices)
+        columns = 2 if count <= 4 else 4
+        for index, label in enumerate(choices):
+            choice_btn = button(str(label), "secondary")
+            choice_btn.setObjectName("LearningChoiceButton")
+            choice_btn.setMinimumHeight(78)
+            choice_btn.setProperty("learning_label", str(label))
+            choice_btn.clicked.connect(
+                lambda _checked=False, selected=str(label): self.submit_learning_choice(selected)
+            )
+            self.learning_choice_layout.addWidget(choice_btn, index // columns, index % columns)
+            self.learning_choice_buttons.append(choice_btn)
+
+    def start_learning_session(self) -> None:
+        self.sync_model_from_setup_controls()
+        try:
+            groups = self._selected_learning_groups()
+            self.learning_feedback.setStyleSheet("")
+            self.learning_feedback.setText("선택한 자모를 컴파일하는 중…")
+            QApplication.processEvents()
+
+            candidates = self._build_learning_candidates(groups)
+            total_labels = sum(len(items) for items in candidates.values())
+            if total_labels < 2:
+                raise RuntimeError("보기 학습을 위해 컴파일 가능한 자모가 최소 2개 필요합니다.")
+
+            plan = self._make_learning_plan(candidates, self.learning_trials.value())
+            if not plan:
+                raise RuntimeError("학습 문제를 만들 수 없습니다.")
+
+            self._learning_candidates = candidates
+            self._learning_selected_group_names = list(groups)
+            self.learning_plan = plan
+            self.learning_index = -1
+            self.learning_rows = []
+            self.learning_target = ""
+            self.learning_command = ""
+            self.learning_answered = False
+            self.learning_replays = 0
+
+            session = re.sub(
+                r"[^0-9A-Za-z가-힣_-]+",
+                "_",
+                self.learning_session_edit.text().strip() or "learning",
+            ).strip("_") or "learning"
+            stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            self.learning_csv_path = DATA_DIR / f"jamo_learning_{session}_{stamp}.csv"
+
+            self.learning_feedback.setText(
+                f"{', '.join(groups)} · 총 {total_labels}개 자모 · "
+                f"보기 최대 {min(self.learning_choice_count.value(), total_labels)}개"
+            )
+            self.next_learning_trial()
+        except Exception as exc:
+            self.learning_feedback.setStyleSheet("")
+            self.learning_feedback.setText("")
+            QMessageBox.critical(self, "선택 학습 시작 실패", str(exc))
+
+    def next_learning_trial(self) -> None:
+        self.learning_index += 1
+        if self.learning_index >= len(self.learning_plan):
+            total = len(self.learning_rows)
+            correct = sum(int(row.get("correct", 0)) for row in self.learning_rows)
+            accuracy = (100.0 * correct / total) if total else 0.0
+            self.learning_progress.setText("LEARNING COMPLETE")
+            self.learning_instruction.setText("선택 자모 학습 완료")
+            self.learning_feedback.setStyleSheet(
+                "background:#EAF8EF;color:#147A3D;border-radius:16px;padding:12px;font-weight:700;"
+            )
+            self.learning_feedback.setText(
+                f"정답 {correct}/{total} · Accuracy {accuracy:.1f}% · 결과: {self.learning_csv_path}"
+            )
+            clear_layout(self.learning_choice_layout)
+            self.learning_choice_buttons = []
+            self.learning_replay_btn.setEnabled(False)
+            self.learning_next_btn.setEnabled(False)
+            return
+
+        item = self.learning_plan[self.learning_index]
+        self.learning_target = str(item["target"])
+        self.learning_command = str(item["command"])
+        self.learning_answered = False
+        self.learning_replays = 0
+        self.learning_started_perf = 0.0
+
+        choices = self._learning_choices_for_target(
+            self.learning_target,
+            self.learning_choice_count.value(),
+        )
+        self._current_learning_choices = list(choices)
+        self._render_learning_choices(choices)
+
+        self.learning_progress.setText(
+            f"TRIAL {self.learning_index + 1} / {len(self.learning_plan)} · {item['group']}"
+        )
+        self.learning_instruction.setText("촉각 자극을 느끼고 해당하는 자모 보기를 누르세요.")
+        self.learning_feedback.setStyleSheet("")
+        self.learning_feedback.setText("자극을 재생합니다…")
+        self.learning_replay_btn.setEnabled(True)
+        self.learning_next_btn.setEnabled(False)
+        QTimer.singleShot(80, lambda: self.play_learning_stimulus(replay=False))
+
+    def play_learning_stimulus(self, replay: bool = True) -> None:
+        if not self.learning_command or self.learning_answered:
+            return
+        try:
+            if replay:
+                self.learning_replays += 1
+            self.send_command(self.learning_command)
+            self.learning_started_perf = time.perf_counter()
+            self.learning_feedback.setText("자극 재생 완료 · 보기에서 답을 선택하세요.")
+        except Exception as exc:
+            self.learning_feedback.setText(f"자극 재생 실패: {exc}")
+
+    def submit_learning_choice(self, selected: str) -> None:
+        if self.learning_answered or not self.learning_target:
+            return
+        self.learning_answered = True
+        elapsed_ms: Any = ""
+        if self.learning_started_perf:
+            elapsed_ms = round((time.perf_counter() - self.learning_started_perf) * 1000.0, 1)
+
+        correct = int(str(selected) == self.learning_target)
+        for choice_btn in self.learning_choice_buttons:
+            label = str(choice_btn.property("learning_label") or choice_btn.text())
+            choice_btn.setCursor(Qt.ArrowCursor)
+            if label == self.learning_target:
+                choice_btn.setProperty("kind", "primary")
+            elif label == str(selected) and not correct:
+                choice_btn.setProperty("kind", "danger")
+            choice_btn.style().unpolish(choice_btn)
+            choice_btn.style().polish(choice_btn)
+
+        if correct:
+            message = f"정답입니다 ✓  {self.learning_target}"
+            if elapsed_ms != "":
+                message += f" · {elapsed_ms} ms"
+            self.learning_feedback.setStyleSheet(
+                "background:#EAF8EF;color:#147A3D;border-radius:16px;padding:12px;font-weight:700;"
+            )
+        else:
+            message = f"오답입니다. 선택 {selected} · 정답 {self.learning_target}"
+            self.learning_feedback.setStyleSheet(
+                "background:#FFF0F0;color:#B3261E;border-radius:16px;padding:12px;font-weight:700;"
+            )
+        self.learning_feedback.setText(message)
+
+        item = self.learning_plan[self.learning_index]
+        selected_groups = list(getattr(self, "_learning_selected_group_names", []))
+        row = {
+            "timestamp": datetime.now().isoformat(timespec="seconds"),
+            "app_version": APP_VERSION,
+            "session_id": self.learning_session_edit.text().strip(),
+            "setup_name": self.setup.setup_name,
+            "setup_hash": self.setup.stable_hash(),
+            "setup_path": str(self.setup_path or ""),
+            "trial_index": self.learning_index + 1,
+            "target_group": item["group"],
+            "target": self.learning_target,
+            "response": str(selected),
+            "correct": correct,
+            "elapsed_ms_from_last_playback": elapsed_ms,
+            "replay_count": self.learning_replays,
+            "choice_count": len(getattr(self, "_current_learning_choices", [])),
+            "choices": "|".join(getattr(self, "_current_learning_choices", [])),
+            "selected_groups": "|".join(selected_groups),
+            "command": self.learning_command,
+        }
+        self.learning_rows.append(row)
+        self._append_learning_csv(row)
+        self.learning_replay_btn.setEnabled(False)
+        self.learning_next_btn.setEnabled(True)
+        self.learning_next_btn.setFocus()
+
+    def _append_learning_csv(self, row: Dict[str, Any]) -> None:
+        if self.learning_csv_path is None:
+            return
+        exists = self.learning_csv_path.exists()
+        with open(self.learning_csv_path, "a", newline="", encoding="utf-8-sig") as f:
+            writer = csv.DictWriter(f, fieldnames=list(row.keys()))
+            if not exists:
+                writer.writeheader()
+            writer.writerow(row)
+
+    # --------- general text-answer quiz ---------
+    def _general_quiz_options(self) -> Tuple[List[str], List[str], List[str], List[str]]:
+        structures: List[str] = []
+        if self.gq_cv_check.isChecked():
+            structures.append("CV")
+        if self.gq_cvc_check.isChecked():
+            structures.append("CVC")
+        if not structures:
+            raise RuntimeError("CV 또는 CVC 구조를 하나 이상 선택하세요.")
+
+        initials: List[str] = []
+        if self.gq_basic_consonant_check.isChecked():
+            initials.extend(BASIC_CONSONANTS)
+        if self.gq_double_consonant_check.isChecked():
+            initials.extend(DOUBLE_CONSONANTS)
+        initials = list(dict.fromkeys(initials))
+        if not initials:
+            raise RuntimeError("기본 자음 또는 쌍자음을 하나 이상 선택하세요.")
+
+        vowels: List[str] = []
+        if self.gq_basic_vowel_check.isChecked():
+            vowels.extend(BASIC_VOWELS)
+        if self.gq_diphthong_check.isChecked():
+            vowels.extend(DIPHTHONG_VOWELS)
+        vowels = list(dict.fromkeys(vowels))
+        if not vowels:
+            raise RuntimeError("기본 모음 또는 이중모음을 하나 이상 선택하세요.")
+
+        finals = [lab for lab in initials if lab in SINGLE_FINAL_CONSONANTS]
+        if "CVC" in structures and not finals:
+            raise RuntimeError("선택한 자음 중 CVC 종성으로 사용할 수 있는 자음이 없습니다.")
+        return structures, initials, vowels, finals
+
+    def _build_general_quiz_candidates(
+        self,
+        source_syllables: Sequence[str],
+        structures: Sequence[str],
+        initials: Sequence[str],
+        vowels: Sequence[str],
+        finals: Sequence[str],
+    ) -> Dict[str, List[Dict[str, Any]]]:
+        """Filter the XLSX inventory; never synthesize an out-of-file syllable."""
+        compiler = HangulCompiler(self.setup)
+        candidates: Dict[str, List[Dict[str, Any]]] = {key: [] for key in structures}
+        initial_set = set(initials)
+        vowel_set = set(vowels)
+        final_set = set(finals)
+        seen: set[str] = set()
+
+        for source_rank, syllable in enumerate(source_syllables, start=1):
+            if syllable in seen:
+                continue
+            seen.add(syllable)
+            dec = compiler.decompose_syllable(syllable)
+            if dec is None:
+                continue
+            cho, jung, jong = dec
+            structure = "CVC" if jong else "CV"
+            if structure not in candidates:
+                continue
+            if cho not in initial_set or jung not in vowel_set:
+                continue
+            if structure == "CVC" and jong not in final_set:
+                continue
+            try:
+                command = compiler.compile_syllable(syllable)
+            except Exception:
+                continue
+            candidates[structure].append({
+                "syllable": syllable,
+                "structure": structure,
+                "cho": cho,
+                "jung": jung,
+                "jong": jong,
+                "command": command,
+                "source_rank": source_rank,
+            })
+        return candidates
+
+    @staticmethod
+    def _make_general_quiz_plan(
+        candidates: Dict[str, List[Dict[str, Any]]],
+        trial_count: int,
+    ) -> List[Dict[str, Any]]:
+        available = [key for key, values in candidates.items() if values]
+        if not available:
+            return []
+        rng = random.Random(time.time_ns())
+        bags: Dict[str, List[Dict[str, Any]]] = {key: [] for key in available}
+        plan: List[Dict[str, Any]] = []
+        while len(plan) < int(trial_count):
+            cycle = list(available)
+            rng.shuffle(cycle)
+            for structure in cycle:
+                if len(plan) >= int(trial_count):
+                    break
+                if not bags[structure]:
+                    bags[structure] = [dict(item) for item in candidates[structure]]
+                    rng.shuffle(bags[structure])
+                item = bags[structure].pop()
+                if plan and item["syllable"] == plan[-1]["syllable"] and bags[structure]:
+                    alternate = bags[structure].pop()
+                    bags[structure].append(item)
+                    item = alternate
+                plan.append(item)
+        return plan
+
+    def _append_general_quiz_chat(self, speaker: str, text: str) -> None:
+        if not hasattr(self, "gq_chat"):
+            return
+        current = self.gq_chat.toPlainText().rstrip()
+        block = f"{speaker}\n{text}"
+        self.gq_chat.setPlainText((current + "\n\n" + block).strip())
+        bar = self.gq_chat.verticalScrollBar()
+        bar.setValue(bar.maximum())
+
+    def start_general_quiz(self) -> None:
+        self.sync_model_from_setup_controls()
+        try:
+            structures, initials, vowels, finals = self._general_quiz_options()
+            self.gq_feedback.setStyleSheet("")
+            self.gq_feedback.setText("Top200 XLSX를 읽고 현재 조건에 맞는 음절을 확인하는 중…")
+            QApplication.processEvents()
+            source_path = Path(self.gq_syllable_edit.text().strip())
+            source_syllables = load_general_quiz_syllables(source_path)
+            if not source_syllables:
+                raise RuntimeError(
+                    "선택한 XLSX에서 현대 한글 음절을 찾지 못했습니다. "
+                    "음절/글자/단어 열 또는 첫 번째 열을 확인하세요."
+                )
+            candidates = self._build_general_quiz_candidates(
+                source_syllables, structures, initials, vowels, finals
+            )
+            missing = [key for key in structures if not candidates.get(key)]
+            if missing:
+                raise RuntimeError(
+                    "syllable_top200.xlsx 안에서 현재 자모 선택과 ISI 설정을 모두 만족하는 "
+                    + ", ".join(missing)
+                    + " 음절이 없습니다. 구조/자모 체크 또는 XLSX 내용을 확인하세요."
+                )
+            plan = self._make_general_quiz_plan(candidates, self.gq_trials.value())
+            if not plan:
+                raise RuntimeError("퀴즈 문제를 만들 수 없습니다.")
+
+            self.general_quiz_plan = plan
+            self.general_quiz_index = -1
+            self.general_quiz_rows = []
+            self.general_quiz_target = ""
+            self.general_quiz_command = ""
+            self.general_quiz_answered = False
+            self.general_quiz_replays = 0
+            session = re.sub(
+                r"[^0-9A-Za-z가-힣_-]+",
+                "_",
+                self.gq_session_edit.text().strip() or "practice",
+            ).strip("_") or "practice"
+            stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            self.general_quiz_csv_path = DATA_DIR / f"general_quiz_{session}_{stamp}.csv"
+
+            self.gq_chat.clear()
+            self._append_general_quiz_chat(
+                "시스템",
+                f"Top200 기반 일반 촉각 퀴즈를 시작합니다. 구조 {', '.join(structures)} · "
+                f"XLSX 음절 {len(source_syllables)}개 · 조건 통과 후보 "
+                f"{sum(len(values) for values in candidates.values())}개 · 문제 {len(plan)}개 · "
+                f"파일 {source_path.name}",
+            )
+            self.gq_feedback.setText(
+                "자극을 느낀 뒤 한글 음절 하나를 입력하세요. 완성형 음절과 ㄱㅏ 같은 자모 입력을 모두 지원합니다."
+            )
+            self.next_general_quiz_trial()
+        except Exception as exc:
+            self.gq_feedback.setStyleSheet("")
+            self.gq_feedback.setText("")
+            QMessageBox.critical(self, "일반 퀴즈 시작 실패", str(exc))
+
+    def next_general_quiz_trial(self) -> None:
+        self.general_quiz_index += 1
+        if self.general_quiz_index >= len(self.general_quiz_plan):
+            total = len(self.general_quiz_rows)
+            correct = sum(int(row.get("correct", 0)) for row in self.general_quiz_rows)
+            accuracy = (100.0 * correct / total) if total else 0.0
+            self.gq_progress.setText("QUIZ COMPLETE")
+            self.gq_instruction.setText("일반 촉각 퀴즈 완료")
+            self.gq_feedback.setStyleSheet(
+                "background:#EAF8EF;color:#147A3D;border-radius:16px;padding:12px;font-weight:700;"
+            )
+            self.gq_feedback.setText(
+                f"정답 {correct}/{total} · Accuracy {accuracy:.1f}% · "
+                f"결과: {self.general_quiz_csv_path}"
+            )
+            self._append_general_quiz_chat(
+                "시스템",
+                f"퀴즈가 끝났습니다. 정답 {correct}/{total}, 정확도 {accuracy:.1f}%입니다.",
+            )
+            self.gq_answer.setEnabled(False)
+            self.gq_submit_btn.setEnabled(False)
+            self.gq_replay_btn.setEnabled(False)
+            self.gq_next_btn.setEnabled(False)
+            return
+
+        item = self.general_quiz_plan[self.general_quiz_index]
+        self.general_quiz_target = str(item["syllable"])
+        self.general_quiz_command = str(item["command"])
+        self.general_quiz_answered = False
+        self.general_quiz_replays = 0
+        self.general_quiz_started_perf = 0.0
+        self.gq_progress.setText(
+            f"TRIAL {self.general_quiz_index + 1} / {len(self.general_quiz_plan)} · {item['structure']}"
+        )
+        self.gq_instruction.setText("촉각 자극을 해석하고 채팅 입력창에 음절을 입력하세요.")
+        self.gq_feedback.setStyleSheet("")
+        self.gq_feedback.setText("자극을 재생합니다…")
+        self.gq_answer.clear()
+        self.gq_answer.setEnabled(True)
+        self.gq_submit_btn.setEnabled(True)
+        self.gq_replay_btn.setEnabled(True)
+        self.gq_next_btn.setEnabled(False)
+        self._append_general_quiz_chat(
+            "시스템",
+            f"문제 {self.general_quiz_index + 1}: 촉각 자극을 재생합니다. 느낀 음절을 입력하세요.",
+        )
+        QTimer.singleShot(80, lambda: self.play_general_quiz_stimulus(replay=False))
+
+    def play_general_quiz_stimulus(self, replay: bool = True) -> None:
+        if not self.general_quiz_command or self.general_quiz_answered:
+            return
+        try:
+            if replay:
+                self.general_quiz_replays += 1
+                self._append_general_quiz_chat("시스템", "촉각 자극을 다시 재생했습니다.")
+            self.send_command(self.general_quiz_command)
+            self.general_quiz_started_perf = time.perf_counter()
+            self.gq_feedback.setText("자극 재생 완료 · 답변을 입력하세요.")
+            self.gq_answer.setFocus()
+        except Exception as exc:
+            self.gq_feedback.setText(f"자극 재생 실패: {exc}")
+
+    @staticmethod
+    def _normalize_general_quiz_answer(text: str) -> str:
+        compact = re.sub(r"\s+", "", str(text))
+        if len(compact) == 1 and 0xAC00 <= ord(compact) <= 0xD7A3:
+            return compact
+        if len(compact) in (2, 3):
+            cho, jung = compact[0], compact[1]
+            jong = compact[2] if len(compact) == 3 else ""
+            if cho in CHOSUNG and jung in JUNGSUNG and jong in JONGSUNG:
+                return compose_hangul_syllable(cho, jung, jong)
+        return compact
+
+    def submit_general_quiz_answer(self) -> None:
+        if self.general_quiz_answered or not self.general_quiz_target:
+            return
+        raw_answer = self.gq_answer.text().strip()
+        if not raw_answer:
+            self.gq_feedback.setText("답변을 입력하세요.")
+            return
+        answer = self._normalize_general_quiz_answer(raw_answer)
+        if len(answer) != 1 or not (0xAC00 <= ord(answer) <= 0xD7A3):
+            self.gq_feedback.setText("한글 음절 하나를 입력하세요. 예: 가 또는 ㄱㅏ")
+            return
+
+        self.general_quiz_answered = True
+        elapsed_ms: Any = ""
+        if self.general_quiz_started_perf:
+            elapsed_ms = round((time.perf_counter() - self.general_quiz_started_perf) * 1000.0, 1)
+        item = self.general_quiz_plan[self.general_quiz_index]
+        correct = int(answer == self.general_quiz_target)
+        self._append_general_quiz_chat("나", answer)
+        if correct:
+            response_text = f"정답입니다 ✓  ({elapsed_ms} ms)" if elapsed_ms != "" else "정답입니다 ✓"
+            self.gq_feedback.setStyleSheet(
+                "background:#EAF8EF;color:#147A3D;border-radius:16px;padding:12px;font-weight:700;"
+            )
+        else:
+            response_text = f"오답입니다. 정답은 {self.general_quiz_target}입니다."
+            self.gq_feedback.setStyleSheet(
+                "background:#FFF0F0;color:#B3261E;border-radius:16px;padding:12px;font-weight:700;"
+            )
+        self._append_general_quiz_chat("시스템", response_text)
+        self.gq_feedback.setText(response_text)
+
+        row = {
+            "timestamp": datetime.now().isoformat(timespec="seconds"),
+            "app_version": APP_VERSION,
+            "session_id": self.gq_session_edit.text().strip(),
+            "setup_name": self.setup.setup_name,
+            "setup_hash": self.setup.stable_hash(),
+            "setup_path": str(self.setup_path or ""),
+            "trial_index": self.general_quiz_index + 1,
+            "structure": item["structure"],
+            "target": self.general_quiz_target,
+            "target_cho": item["cho"],
+            "target_jung": item["jung"],
+            "target_jong": item["jong"],
+            "source_xlsx": self.gq_syllable_edit.text().strip(),
+            "source_rank": item.get("source_rank", ""),
+            "response_raw": raw_answer,
+            "response": answer,
+            "correct": correct,
+            "elapsed_ms_from_last_playback": elapsed_ms,
+            "replay_count": self.general_quiz_replays,
+            "command": self.general_quiz_command,
+            "include_basic_consonants": int(self.gq_basic_consonant_check.isChecked()),
+            "include_double_consonants": int(self.gq_double_consonant_check.isChecked()),
+            "include_basic_vowels": int(self.gq_basic_vowel_check.isChecked()),
+            "include_diphthongs": int(self.gq_diphthong_check.isChecked()),
+        }
+        self.general_quiz_rows.append(row)
+        self._append_general_quiz_csv(row)
+        self.gq_answer.setEnabled(False)
+        self.gq_submit_btn.setEnabled(False)
+        self.gq_replay_btn.setEnabled(False)
+        self.gq_next_btn.setEnabled(True)
+        self.gq_next_btn.setFocus()
+
+    def _append_general_quiz_csv(self, row: Dict[str, Any]) -> None:
+        if self.general_quiz_csv_path is None:
+            return
+        exists = self.general_quiz_csv_path.exists()
+        with open(self.general_quiz_csv_path, "a", newline="", encoding="utf-8-sig") as f:
+            writer = csv.DictWriter(f, fieldnames=list(row.keys()))
+            if not exists:
+                writer.writeheader()
+            writer.writerow(row)
+
     # --------- voice backend ---------
     def choose_backend(self) -> None:
         path, _ = QFileDialog.getOpenFileName(self, "Voice backend 선택", str(APP_DIR), "Python (*.py)")
         if path: self.backend_edit.setText(path)
+
+    def choose_general_quiz_syllable(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            "일반 퀴즈용 syllable_top200.xlsx 선택",
+            str(APP_DIR),
+            "Excel (*.xlsx)",
+        )
+        if path:
+            self.gq_syllable_edit.setText(path)
 
     def choose_syllable(self) -> None:
         path, _ = QFileDialog.getOpenFileName(self, "Syllable XLSX 선택", str(APP_DIR), "Excel (*.xlsx)")

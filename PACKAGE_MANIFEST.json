@@ -1,20 +1,29 @@
 {
-  "package": "Hangul Tactile Designer Portable v8",
+  "package": "Hangul Tactile Designer Portable v17",
   "entrypoint": "HangulTactileDesigner.exe",
   "fallback_entrypoint": "START_HERE_HangulTactileDesigner.cmd",
-  "recommended_python": "64-bit Python 3.11 or 3.12",
-  "launcher_type": "Windows x86-64 bootstrap executable; source included",
-  "arduino_firmware": "Use existing firmware unchanged; reference copy: korean2_no_relay_dual_device_18ch_softpwm.ino",
-  "timing_semantics_version": 4,
-  "fixes": [
-    "Default consonant duration split changed to 300 ms",
-    "Move consonant duration threshold editing to the advanced SOA dialog",
-    "Add editable motion duration threshold",
-    "Split motion timing into short-motion and long-motion SOA matrix rows/columns",
-    "Classify motion using actual compiled duration",
-    "Preserve raw /i and /d commands with the existing Arduino dot syntax",
-    "Keep syllable and word boundaries as end-to-start ISI",
-    "Retain high-DPI scroll-layout fix"
+  "repair_entrypoint": "REINSTALL_FOR_THIS_PC.cmd",
+  "python_support": "64-bit Python 3.10-3.13",
+  "automatic_python": "Python 3.12.10 per-user install via winget or python.org fallback",
+  "arduino_firmware": "unchanged",
+  "timing_semantics_version": 6,
+  "timing_model": "All internal and boundary timing values are end-to-start ISI",
+  "new_fixes": [
+    "Replace all generated onset-to-onset SOA timing with end-to-start ISI",
+    "Remove overlap exception scanner and adjustment workflow",
+    "Composite steps store isi_before_ms",
+    "CV/CVC duration thresholds only select ISI rows",
+    "Migrate v1-v5 setup JSON files to simplified v6 ISI semantics",
+    "Show a migration notice when an older default.json is loaded"
+  ],
+  "retained_features": [
+    "Automatic default.json startup loading",
+    "Top200 XLSX text-answer general quiz",
+    "Selected-jamo multiple-choice learning",
+    "Voice quiz",
+    "Raw /i and /d preservation",
+    "Automatic Python installation",
+    "High-DPI UI fixes"
   ],
   "files": [
     {
@@ -44,13 +53,13 @@
     },
     {
       "name": "hangul_tactile_default_setup.json",
-      "size_bytes": 15520,
-      "sha256": "94673e48b8a0ebab84baac67f45f7f46db34609fb1ecf4ec975d8487c5e7fa7d"
+      "size_bytes": 22624,
+      "sha256": "07584b0571893470e7693673f6d4777ace1ea1eb6ecaab122ce4cea01fb7a1c1"
     },
     {
       "name": "hangul_tactile_designer.py",
-      "size_bytes": 146731,
-      "sha256": "44ef5cde127ca236209c55a8b925bcd21eb99646c2ab15788698c44e2d67173f"
+      "size_bytes": 213533,
+      "sha256": "981eb3d9c05e599888c24ac5e54711d3ea3d1b307274e9cd586292c975227b04"
     },
     {
       "name": "hangul_tactile_designer.spec",
@@ -74,8 +83,8 @@
     },
     {
       "name": "install_hangul_tactile_designer.bat",
-      "size_bytes": 3842,
-      "sha256": "966e1b573daa523cb1a27c0e225ffd72e00831f1b1ef82e92aa11cc50de6138a"
+      "size_bytes": 8488,
+      "sha256": "7b702743ad9ee8d28e16a94bdbf6c76e60bda37de32d4c7ae0d158c044f4498e"
     },
     {
       "name": "korean2_no_relay_dual_device_18ch_softpwm.ino",
@@ -94,13 +103,18 @@
     },
     {
       "name": "README.md",
-      "size_bytes": 4342,
-      "sha256": "6621cc4fbd04ed0d39f067c23922c1f76191323d91633d3f84bf8ef564217a94"
+      "size_bytes": 3899,
+      "sha256": "03904419ec80031d8dc8639cc3ac7789599ab83cd424b05fadeb2209033aee97"
+    },
+    {
+      "name": "REINSTALL_FOR_THIS_PC.cmd",
+      "size_bytes": 443,
+      "sha256": "24c50ea12292f3bf93537cd44b0a53a68179d3868ac34fd609759633065e356c"
     },
     {
       "name": "requirements_hangul_tactile_designer.txt",
-      "size_bytes": 277,
-      "sha256": "4f4679f720646c4836d798231f51f9f7f8a6b6c4f6c271b3f86946c10e11d1fc"
+      "size_bytes": 310,
+      "sha256": "e2655d59aac403d3e43d18cefa38fe5dab0accb8a52a79a42e6cb095d3730017"
     },
     {
       "name": "reset_local_environment.bat",
@@ -119,13 +133,13 @@
     },
     {
       "name": "START_HERE_HangulTactileDesigner.cmd",
-      "size_bytes": 946,
-      "sha256": "ebd7d2cd402cf791c072b38d79ae06ed62cc983c6bc651f599545b1a5f88ccac"
+      "size_bytes": 1124,
+      "sha256": "93869c30f98d9cd96c671c620c9ee8737f39076b4b56ef5ce8e65d7b1c7b300d"
     },
     {
-      "name": "V8_VALIDATION.txt",
-      "size_bytes": 674,
-      "sha256": "549a52cda72326a553133cfddb8a44391e9fbe2f9465a1f8c94a92531ec827a1"
+      "name": "V17_VALIDATION.txt",
+      "size_bytes": 1718,
+      "sha256": "b896b7de514404568f0f88501d032a63273bee5b6319c33388ae247452c16a64"
     },
     {
       "name": "verify_hangul_tactile_install.py",

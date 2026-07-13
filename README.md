@@ -1,107 +1,102 @@
-# Hangul Tactile Designer — Portable v8
+# Hangul Tactile Designer — Portable v17
 
-특정 Windows 사용자명이나 Python 설치 경로를 저장하지 않는 휴대용 패키지입니다. 다른 PC에서 복사한 오래된 `.venv`가 발견되면 자동으로 삭제하고 현재 PC의 Python으로 다시 생성합니다.
+Windows 사용자명이나 Python 설치 경로를 저장하지 않는 휴대용 버전입니다. 다른 PC에서 복사된 오래된 `.venv`는 현재 PC 기준으로 다시 생성할 수 있습니다.
 
 ## 실행
 
 1. ZIP을 완전히 압축 해제합니다.
-2. `HangulTactileDesigner.exe`를 더블클릭합니다.
-3. 첫 실행 때 필요한 Python 패키지를 현재 폴더의 `.venv`에 설치합니다.
+2. `HangulTactileDesigner.exe`를 실행합니다.
+3. 처음 실행할 때 Python 환경이 없으면 자동 설치를 진행합니다.
 
-EXE가 차단되면 `START_HERE_HangulTactileDesigner.cmd`를 실행하세요. 권장 환경은 Windows 10/11과 64-bit Python 3.11 또는 3.12입니다.
+실행 문제가 있으면 `REINSTALL_FOR_THIS_PC.cmd`를 실행하세요.
 
-## v8 핵심 수정
+## v17 핵심 변경: 전체 타이밍을 ISI로 통일
 
-### 1. 현재 Arduino 코드 그대로 사용
+Composite, CV, CVC, 복합 종성, 음절 경계, 단어 경계의 모든 값이 **end-to-start ISI**로 동작합니다.
 
-Arduino firmware를 새 버전으로 바꿀 필요가 없습니다. 사용자가 제공한 현재 코드를 그대로 포함했습니다.
-
-- `korean2_no_relay_dual_device_18ch_softpwm.ino`
-- `dual_device_temporal_controller.ino`
-
-두 파일의 내용은 사용자가 제공한 코드와 같습니다.
-
-### 2. `/i`, `/d` motion command 보존
-
-다음 raw command는 고정 PWM 값으로 변환하지 않고 그대로 전송합니다.
+ISI는 다음 의미입니다.
 
 ```text
-#5/150.#5/d,4/i/100.#4/150
+앞 자극이 완전히 끝남
+→ 설정한 ISI만큼 기다림
+→ 다음 자극 시작
 ```
 
-따라서 더 이상 아래처럼 `128` 값으로 바뀌지 않습니다.
+예를 들어 앞 모음 자극의 실제 길이가 1000 ms이고 모음→종성 ISI가 500 ms라면 종성은 모음 시작 후 1500 ms에 시작합니다. 따라서 자극 길이가 길어져도 겹침 오류나 별도의 예외 보정이 필요하지 않습니다.
+
+### 기본값
+
+- Composite 내부 ISI: 150 ms
+- CV 자음→모음 ISI: 250 ms
+- CVC 첫 자음→모음 ISI: 250 ms
+- CVC 모음→종성 ISI: 250 ms
+- 복합 종성 내부 ISI: 150 ms
+- 음절 경계 ISI: 350 ms
+- 단어 경계 ISI: 650 ms
+
+### Duration 분기
+
+자음과 모션의 duration 기준은 유지됩니다. 다만 duration은 **어떤 ISI 행을 사용할지 선택하는 용도**일 뿐이며, 행렬의 숫자는 항상 앞 자극 종료 후 기다리는 시간입니다.
+
+### 고급 ISI 설정
+
+고급 설정에서는 다음을 조절할 수 있습니다.
+
+- 자음 duration 분기 기준
+- 모션 duration 분기 기준
+- 자극 유형별 ISI 행렬
+- 특정 자모 pair ISI override
+
+CV와 CVC 첫 자음 구간의 `짧음`·`김` 행은 오른쪽 기본 설정과 동기화됩니다.
+
+## 기존 SOA 셋업 자동 변환
+
+`hangul_tactile_setups/default.json`이 v16 이하 형식이면 실행할 때 자동으로 ISI 형식으로 변환해 불러옵니다.
+
+- Composite와 일반 구간은 이전 물리적 간격에 가까운 단순 ISI 값으로 변환
+- 기존 pair override도 가능한 범위에서 ISI로 변환
+- 기존 Composite Step SOA는 실제 앞 Step duration을 반영해 ISI로 변환
+- 변환 후 `저장`을 누르면 v17 형식으로 저장
+
+원본 JSON 파일은 자동으로 덮어쓰지 않으며, 사용자가 저장할 때만 변경됩니다.
+
+## 자동 default 불러오기
+
+프로그램 시작 시 다음 파일을 자동으로 불러옵니다.
 
 ```text
-#5=255/150.#4=128,5=128/100.#4=255/150
+hangul_tactile_setups/default.json
 ```
 
-현재 Arduino 문법으로 표현할 수 없는 staggered overlap이 설정되면 ramp를 임의 변환하지 않고 오류 메시지를 표시합니다. 이 경우 SOA를 앞 자극 duration 이상으로 설정해야 합니다.
+대소문자가 다른 `Default.json`도 인식합니다. 파일이 없으면 내장 기본 셋업으로 새 `default.json`을 생성합니다.
 
-### 3. 자음 duration 기준 기본값 300 ms
+## 유지된 기능
 
-일반 자음→모음 SOA는 앞 자음의 실제 컴파일 duration을 사용해 자동 분기합니다.
+- 현재 Arduino firmware 그대로 사용
+- raw `/i`, `/d` 명령 보존
+- 디자인 편집 및 자모 미리보기
+- 선택 자모 객관식 학습
+- Top200 XLSX 기반 일반 CV/CVC 퀴즈
+- 보이스 퀴즈
+- 결과 CSV 저장
+- 고해상도/고배율 UI 잘림 수정
+- 다른 PC에서 Python 자동 설치
 
-- duration ≤ 300 ms: 짧은 자음 SOA
-- duration > 300 ms: 긴 자음 SOA
+## 일반 퀴즈
 
-기준값은 고정이 아니며 고급 설정에서 변경할 수 있습니다.
+일반 퀴즈는 `syllable_top200.xlsx`에서 읽은 실제 한글 음절만 사용합니다.
 
-### 4. motion도 실제 길이별 SOA 설정
-
-기존의 하나짜리 `모션` 유형을 다음 두 유형으로 나눴습니다.
-
-- 짧은 모션
-- 긴 모션
-
-모션의 실제 컴파일 duration과 `모션 duration 기준`을 비교해 고급 SOA 행렬의 행과 열을 자동 선택합니다. 기본 모션 기준도 300 ms이며 고급 설정에서 변경할 수 있습니다.
-
-### 5. 고급 설정 위치
-
-오른쪽 `음절 타이밍` 패널에서 아래 버튼을 누릅니다.
-
-```text
-고급 duration·유형·pair SOA
-```
-
-고급 창 상단에서 다음을 설정할 수 있습니다.
-
-- 자음 duration 기준
-- 모션 duration 기준
-
-아래 SOA 행렬에는 `짧은 모션`과 `긴 모션`이 별도 행·열로 표시됩니다. 특정 자모 pair override가 있으면 행렬보다 우선합니다.
-
-### 6. 음절·단어 경계는 ISI
-
-- 음절 경계 ISI: 앞 음절의 모든 자극이 끝난 뒤부터 다음 음절 초성 시작까지
-- 단어 경계 ISI: 앞 단어의 모든 자극이 끝난 뒤부터 다음 단어 첫 초성 시작까지
-
-### 7. 화면 깨짐 수정 유지
-
-낮은 화면 높이와 Windows 고배율 환경에서도 오른쪽 타이밍 패널이 내부 스크롤되며 라벨과 입력창 높이를 유지합니다.
-
-## SOA 적용 우선순위
-
-1. 특정 자모 pair override
-2. 일반 자음→모음: 실제 자음 duration의 짧음/김 규칙
-3. 모션이 포함된 경계: 실제 모션 duration의 짧은 모션/긴 모션 행렬
-4. 나머지: 고급 유형 행렬 또는 기본 SOA
-
-Composite 편집 화면에서 각 Step에 직접 입력한 SOA는 해당 Step의 개별값으로 사용됩니다.
+- 셀에 단어가 있으면 음절 단위로 분리
+- 중복 음절 제거
+- 선택한 CV/CVC, 기본·쌍자음, 기본·복합 모음 조건으로 필터링
+- 현재 디자인과 ISI 규칙으로 컴파일 가능한 음절만 출제
 
 ## 주요 파일
 
-- `HangulTactileDesigner.exe`: Windows 64-bit 부트스트랩 실행기
-- `hangul_tactile_designer.py`: 전체 메인 소스
-- `hangul_voice_backend.py`: 음성 인식·학습 백엔드
-- `hangul_tactile_default_setup.json`: 기본 디자인과 timing 설정
+- `HangulTactileDesigner.exe`: Windows 실행기
+- `hangul_tactile_designer.py`: 메인 프로그램
+- `hangul_voice_backend.py`: 음성 퀴즈 백엔드
+- `hangul_tactile_default_setup.json`: v17 기본 디자인
 - `korean2_no_relay_dual_device_18ch_softpwm.ino`: 현재 Arduino 코드 사본
-- `reset_local_environment.bat`: 로컬 `.venv` 초기화
+- `REINSTALL_FOR_THIS_PC.cmd`: 현재 PC용 Python 환경 재설치
 - `diagnose_environment.bat`: 실행 환경 진단
-- `build_standalone_exe.bat`: PyInstaller 독립 실행 폴더 생성
-
-## 문제 해결
-
-1. 프로그램과 Python 창을 모두 닫습니다.
-2. `reset_local_environment.bat`를 실행합니다.
-3. `START_HERE_HangulTactileDesigner.cmd`를 다시 실행합니다.
-4. 계속 실패하면 `diagnose_environment.bat`로 `environment_diagnostic.txt`를 생성합니다.

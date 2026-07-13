@@ -1,8 +1,8 @@
 {
   "setup_name": "Default Hangul Design",
   "setup_version": 1,
-  "created_at": "2026-07-10T14:44:50",
-  "updated_at": "2026-07-10T14:44:50",
+  "created_at": "2026-07-13T06:59:16",
+  "updated_at": "2026-07-13T06:59:16",
   "baudrate": 115200,
   "left_marker": "#",
   "right_marker": "@",
@@ -17,31 +17,357 @@
     "8": 8,
     "9": 7
   },
-  "default_composite_gap_ms": 350,
-  "cv_gap_ms": 450,
-  "cvc_cv_gap_ms": 450,
-  "cvc_vc_gap_ms": 450,
-  "compound_final_gap_ms": 350,
+  "default_composite_gap_ms": 150,
+  "cv_gap_ms": 250,
+  "cvc_cv_gap_ms": 250,
+  "cvc_vc_gap_ms": 250,
+  "compound_final_gap_ms": 150,
   "inter_syllable_gap_ms": 350,
   "inter_word_gap_ms": 650,
   "inter_syllable_isi_ms": 350,
   "inter_word_isi_ms": 650,
   "cv_duration_split_ms": 300,
   "motion_duration_split_ms": 300,
-  "cv_short_soa_ms": 450,
-  "cv_long_soa_ms": 700,
-  "cvc_cv_short_soa_ms": 450,
-  "cvc_cv_long_soa_ms": 700,
-  "use_duration_based_cv_soa": true,
-  "timing_semantics_version": 4,
+  "cv_short_isi_ms": 250,
+  "cv_long_isi_ms": 250,
+  "cvc_cv_short_isi_ms": 250,
+  "cvc_cv_long_isi_ms": 250,
+  "use_duration_based_cv_isi": true,
+  "timing_semantics_version": 6,
   "timing_defaults_ms": {
-    "composite": 350,
-    "cv": 450,
-    "cvc_cv": 450,
-    "cvc_vc": 450,
-    "compound_final": 350
+    "composite": 150,
+    "cv": 250,
+    "cvc_cv": 250,
+    "cvc_vc": 250,
+    "compound_final": 150
   },
-  "timing_matrix_ms": {},
+  "timing_matrix_ms": {
+    "composite": {
+      "short": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      },
+      "long": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      },
+      "repeat": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      },
+      "motion_short": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      },
+      "motion_long": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      },
+      "composite": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      },
+      "custom": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      }
+    },
+    "cv": {
+      "short": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "long": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "repeat": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "motion_short": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "motion_long": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "composite": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "custom": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      }
+    },
+    "cvc_cv": {
+      "short": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "long": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "repeat": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "motion_short": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "motion_long": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "composite": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "custom": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      }
+    },
+    "cvc_vc": {
+      "short": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "long": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "repeat": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "motion_short": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "motion_long": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "composite": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      },
+      "custom": {
+        "short": 250,
+        "long": 250,
+        "repeat": 250,
+        "motion_short": 250,
+        "motion_long": 250,
+        "composite": 250,
+        "custom": 250
+      }
+    },
+    "compound_final": {
+      "short": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      },
+      "long": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      },
+      "repeat": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      },
+      "motion_short": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      },
+      "motion_long": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      },
+      "composite": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      },
+      "custom": {
+        "short": 150,
+        "long": 150,
+        "repeat": 150,
+        "motion_short": 150,
+        "motion_long": 150,
+        "composite": 150,
+        "custom": 150
+      }
+    }
+  },
   "timing_pair_overrides_ms": {},
   "jamo": {
     "ㄱ": {
@@ -237,11 +563,11 @@
       "steps": [
         {
           "ref": "ㄱ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㄱ",
-          "soa_before_ms": 350
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -259,11 +585,11 @@
       "steps": [
         {
           "ref": "ㄷ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㄷ",
-          "soa_before_ms": 350
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -281,11 +607,11 @@
       "steps": [
         {
           "ref": "ㅂ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅂ",
-          "soa_before_ms": 350
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -303,11 +629,11 @@
       "steps": [
         {
           "ref": "ㅅ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅅ",
-          "soa_before_ms": 350
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -325,11 +651,11 @@
       "steps": [
         {
           "ref": "ㅈ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅈ",
-          "soa_before_ms": 350
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -425,11 +751,11 @@
       "steps": [
         {
           "ref": "ㅡ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅣ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -447,11 +773,11 @@
       "steps": [
         {
           "ref": "ㅏ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅏ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -469,11 +795,11 @@
       "steps": [
         {
           "ref": "ㅓ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅓ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -491,11 +817,11 @@
       "steps": [
         {
           "ref": "ㅗ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅗ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -513,11 +839,11 @@
       "steps": [
         {
           "ref": "ㅜ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅜ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -535,11 +861,11 @@
       "steps": [
         {
           "ref": "ㅏ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅣ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -557,11 +883,11 @@
       "steps": [
         {
           "ref": "ㅓ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅣ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -579,11 +905,11 @@
       "steps": [
         {
           "ref": "ㅑ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅣ",
-          "soa_before_ms": 650
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -601,11 +927,11 @@
       "steps": [
         {
           "ref": "ㅕ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅣ",
-          "soa_before_ms": 650
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -623,11 +949,11 @@
       "steps": [
         {
           "ref": "ㅗ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅏ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -645,15 +971,15 @@
       "steps": [
         {
           "ref": "ㅗ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅏ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         },
         {
           "ref": "ㅣ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -671,11 +997,11 @@
       "steps": [
         {
           "ref": "ㅗ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅣ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -693,11 +1019,11 @@
       "steps": [
         {
           "ref": "ㅜ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅓ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -715,15 +1041,15 @@
       "steps": [
         {
           "ref": "ㅜ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅓ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         },
         {
           "ref": "ㅣ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",
@@ -741,11 +1067,11 @@
       "steps": [
         {
           "ref": "ㅜ",
-          "soa_before_ms": 0
+          "isi_before_ms": 0
         },
         {
           "ref": "ㅣ",
-          "soa_before_ms": 550
+          "isi_before_ms": 150
         }
       ],
       "raw_command": "",

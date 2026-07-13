@@ -14,13 +14,15 @@ if "%NEED_INSTALL%"=="0" (
 )
 
 if "%NEED_INSTALL%"=="1" (
-    echo The program environment is missing, incomplete, or belongs to another PC.
-    echo It will now be installed locally in this folder.
+    echo The local program environment is missing, incomplete, or copied from another PC.
+    echo Python and the required packages will be prepared automatically.
+    echo Internet access is required on the first run.
     echo.
     call "%CD%\install_hangul_tactile_designer.bat" /nopause
     if errorlevel 1 (
         echo.
-        echo Installation did not complete. Press any key to close.
+        echo Installation did not complete.
+        echo Review the messages above or python_install.log, then press any key to close.
         pause >nul
         exit /b 1
     )

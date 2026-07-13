@@ -1,0 +1,41 @@
+Hangul Tactile Designer Portable v17 validation
+
+Timing semantics:
+- timing_semantics_version is 6.
+- Composite, CV, CVC, compound-final, inter-syllable, and inter-word timing
+  are all end-to-start ISI.
+- Compiler onset calculation is previous complete duration + configured ISI.
+- The overlap exception scanner and adjustment UI were removed because generated
+  ISI timelines cannot start the next jamo before the previous jamo ends.
+- Raw /i and /d commands remain unchanged.
+
+Behavior tests:
+- All 11,172 modern Hangul syllables compiled with the bundled default setup.
+- A custom 1000 ms vowel with 500 ms CVC vowel-to-final ISI produced the final
+  consonant at 1500 ms after the vowel onset and serialized without overlap.
+- Default setup commands preserve raw motion tokens such as /i and /d.
+- A v5 setup migrated to v6 with:
+  Composite ISI 150 ms,
+  CV short/long ISI rows 250/300 ms,
+  CVC first-consonant short/long ISI rows 250/300 ms,
+  CVC vowel-to-final ISI 250 ms,
+  compound-final ISI 150 ms.
+- Legacy Composite step SOA values migrated to explicit isi_before_ms values.
+- JSON v6 round-trip preserved the authoritative ISI matrix and pair overrides.
+
+Static validation:
+- hangul_tactile_designer.py passed py_compile.
+- hangul_voice_backend.py passed py_compile.
+- launch_hangul_tactile_designer.py passed py_compile.
+- hangul_tactile_default_setup.json parsed successfully and uses version 6.
+
+Retained:
+- Existing Arduino firmware.
+- Top200 XLSX general quiz.
+- Selected-jamo multiple-choice learning.
+- Voice quiz.
+- default.json startup loading.
+- Automatic Python installation and high-DPI UI fixes.
+
+A full Windows GUI and physical Arduino playback test was not possible in this
+environment.
